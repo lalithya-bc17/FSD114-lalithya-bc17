@@ -5,3 +5,5 @@ from .models import Student, Teacher
 admin.site.register(Student)
 admin.site.register(Teacher)
 # Register your models here.
+
+

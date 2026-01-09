@@ -27,4 +27,5 @@ urlpatterns = [
 
     # Core APIs
     path('api/', include('core.urls')),
+    path('api/', include('courses.urls')),
 ]

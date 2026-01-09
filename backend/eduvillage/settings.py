@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'core',
     'corsheaders',
+    'courses',
 
     'rest_framework',
     'rest_framework_simplejwt',
