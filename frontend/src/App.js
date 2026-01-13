@@ -3,6 +3,7 @@ import Login from "./Login";
 import Dashboard from "./Dashboard";
 import CoursePage from "./CoursePage";
 import LessonPage from "./LessonPage";
+import QuizPage from "./QuizPage";
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -14,6 +15,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/quiz/:id" element={<QuizPage />} />
 
         <Route
           path="/dashboard"
@@ -40,6 +42,7 @@ export default function App() {
               <LessonPage />
             </PrivateRoute>
           }
+        
         />
       </Routes>
     </BrowserRouter>

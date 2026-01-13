@@ -5,79 +5,93 @@ import "./styles.css";
 
 export default function Dashboard() {
   const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Load student dashboard
   useEffect(() => {
     const load = async () => {
       try {
         const data = await getDashboard();
-        setCourses(data);
-      } catch (err) {
-        console.error("Dashboard error:", err);
+        setCourses(data || []);
+      } catch (e) {
+        console.error("Dashboard load failed", e);
         alert("Session expired. Please login again.");
         localStorage.removeItem("token");
         navigate("/");
-      } finally {
-        setLoading(false);
       }
     };
-
     load();
   }, [navigate]);
 
-  // Resume last lesson
-  const handleResume = async (courseId) => {
-    try {
-      const data = await resumeCourse(courseId);
+  const handleView = (course) => {
+    if (course.completed === course.total) {
+      alert("🎉 You have completed all lessons in this course!");
+      return;
+    }
+    navigate(`/course/${course.course_id}`);
+  };
 
+  const handleResume = async (course) => {
+    try {
+      const data = await resumeCourse(course.course_id);
       if (data.lesson_id) {
         navigate(`/lesson/${data.lesson_id}`);
       } else {
-        alert("No lesson to resume for this course");
+        alert("No lesson to resume.");
       }
-    } catch (err) {
-      console.error("Resume error:", err);
+    } catch (e) {
+      console.error("Resume failed", e);
       alert("Failed to resume course");
     }
   };
 
-  if (loading) return <p>Loading dashboard...</p>;
-
   return (
-    <div className="container">
-      <h2>📚 My Learning</h2>
+    <div className="dashboard">
+      <h2>My Learning</h2>
 
-      {courses.length === 0 && <p>No enrolled courses</p>}
+      {courses.map((course) => {
+        const percent = course.progress;
+        const isCompleted = course.completed === course.total;
 
-      {courses.map((course) => (
-        <div key={course.course_id} className="card">
-          <h3>{course.course}</h3>
+        return (
+          <div key={course.course_id} className="course-card">
+            <h3>{course.course}</h3>
 
-          {/* Progress Bar */}
-          <div className="progress-bg">
-            <div
-              className="progress-fill"
-              style={{ width: `${course.progress}%` }}
-            />
-          </div>
+            <div className="progress">
+              <div className="progress-bar" style={{ width: percent + "%" }}>
+                {percent}%
+              </div>
+            </div>
 
-          <p>
-            {course.completed} / {course.total} lessons completed
-          </p>
+            <p>
+              {course.completed}/{course.total} lessons completed
+            </p>
 
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button onClick={() => navigate(`/course/${course.course_id}`)}>
-              View Lessons
+            <button
+              onClick={() => handleView(course)}
+              className={isCompleted ? "lesson-completed" : "lesson-open"}
+            >
+              {isCompleted ? "Completed" : "View Lessons"}
             </button>
 
-            <button onClick={() => handleResume(course.course_id)}>
-              Resume
+            <button onClick={() => handleResume(course)} disabled={isCompleted}>
+              {isCompleted ? "Completed" : "Resume"}
             </button>
+
+            {/* 🎓 CERTIFICATE BUTTON */}
+            {isCompleted && (
+              <a
+                href={`http://127.0.0.1:8000/api/certificate/${course.course_id}/`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <button className="certificate-btn">
+                  🎓 Download Certificate
+                </button>
+              </a>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

@@ -15,15 +15,8 @@ export default function CoursePage() {
       setLoading(true);
       try {
         const data = await getCourseLessons(id);
-        const lessonList = data.courses || [];
-
-        setLessons(lessonList);
-
-        // Show popup if all lessons are completed
-        const allCompleted = lessonList.every(l => l.status === "completed");
-        if (allCompleted && lessonList.length > 0) {
-          alert("🎉 All lessons are completed! No lessons left to complete.");
-        }
+        setLessons(data.courses || []);
+        // Backend may return array or { lessons: [] }
       } catch (err) {
         console.error("Lesson fetch error:", err);
         setLessons([]);
@@ -39,6 +32,21 @@ export default function CoursePage() {
   if (!lessons || lessons.length === 0)
     return <p>No lessons found for this course.</p>;
 
+  // 🎉 If all lessons are completed
+  const allCompleted = lessons.every(l => l.status === "completed");
+
+  if (allCompleted) {
+    return (
+      <div className="container">
+        <h2>🎉 Course Completed</h2>
+        <p>No lessons left to complete.</p>
+        <button onClick={() => navigate("/dashboard")}>
+          ⬅ Back to Dashboard
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="container">
       <button onClick={() => navigate(-1)}>⬅ Back</button>
@@ -48,20 +56,15 @@ export default function CoursePage() {
         const prevCompleted =
           index === 0 || lessons[index - 1].status === "completed";
 
-        const canOpen =
-          lesson.status !== "completed" && lesson.unlocked && prevCompleted;
+        const canOpen = lesson.unlocked && prevCompleted;
 
         const handleClick = () => {
-          if (lesson.status === "completed") {
-            alert("✅ This lesson is already completed!");
-            return;
-          }
           if (!lesson.unlocked) {
-            alert("🔒 This lesson is locked!");
+            alert("This lesson is locked!");
             return;
           }
           if (!prevCompleted) {
-            alert("⚠️ Please complete the previous lesson first!");
+            alert("Please complete the previous lesson first!");
             return;
           }
           navigate(`/lesson/${lesson.id}`);

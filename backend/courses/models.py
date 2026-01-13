@@ -16,6 +16,8 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     order = models.IntegerField(default=1)
+    # ✅ Step 1: Video upload
+    video = models.FileField(upload_to="lesson_videos/", blank=True, null=True)
     class Meta:
         ordering = ["order"]
     

@@ -142,3 +142,6 @@ SIMPLE_JWT = {
 }
 #CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
+# MEDIA files (videos, images, PDFs)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"

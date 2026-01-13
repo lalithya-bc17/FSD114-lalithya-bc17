@@ -345,3 +345,48 @@ def student_dashboard_page(request):
     return render(request, "courses/student_dashboard.html", {
         "dashboard": dashboard
     })
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Course, Progress
+from core.permissions import IsStudent  # if you have this
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsStudent])
+def certificate(request, course_id):
+    student = request.user.student
+    course = Course.objects.get(id=course_id)
+
+    total = course.lessons.count()
+    done = Progress.objects.filter(student=student, lesson__course=course, completed=True).count()
+
+    if done != total:
+        return Response({"error": "Course not completed"}, status=403)
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{course.title}_certificate.pdf"'
+
+    p = canvas.Canvas(response, pagesize=A4)
+    p.setFont("Helvetica-Bold", 24)
+    p.drawString(100, 700, "Certificate of Completion")
+
+    p.setFont("Helvetica", 18)
+    p.drawString(100, 650, student.user.username)
+    p.drawString(100, 620, f"has completed {course.title}")
+
+    p.save()
+    return response
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def mark_lesson_completed(request, lesson_id):
+    student = request.user.student
+    lesson = Lesson.objects.get(id=lesson_id)
+
+    progress, created = Progress.objects.get_or_create(student=student, lesson=lesson)
+    progress.completed = True
+    progress.save()
+
+    return Response({"success": True})

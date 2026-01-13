@@ -27,4 +27,9 @@ urlpatterns = [
 
     path("dashboard/", views.student_dashboard_page, name="student-dashboard"),
     path("student/course/<int:course_id>/resume/", views.resume_course),
+
+    # ✅ Fixed: Use views. for both
+    path("resume/<int:course_id>/", views.resume_course, name="resume_course"),
+    path("certificate/<int:course_id>/", views.certificate, name="certificate"),
+    path("student/lesson/<int:lesson_id>/complete/", views.mark_lesson_completed),
 ]
