@@ -66,7 +66,7 @@ export const submitQuiz = async (quizId, answers) => {
 };
 // GET QUIZ
 export const getQuiz = async (quizId) => {
-  const res = await fetch(`http://127.0.0.1:8000/api/quiz/${quizId}/`, {
+  const res = await fetch(`http://127.0.0.1:8000/quiz/${quizId}/`, {
     headers: authHeader()
   });
 

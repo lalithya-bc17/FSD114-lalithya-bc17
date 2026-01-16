@@ -154,3 +154,26 @@ video {
   line-height: 12px;
   font-weight: bold;
 }
+.blue-completed {
+  background-color: #1e3a8a !important;
+  color: white !important;
+  cursor: pointer;
+}
+.lesson-completed-dark {
+  background-color: #1e3a8a; /* dark blue */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: default;
+}
+
+.certificate-btn {
+  background-color: #1e3a8a; /* dark blue */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  margin-top: 6px;
+  cursor: pointer;
+}

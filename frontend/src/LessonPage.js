@@ -129,6 +129,8 @@ export default function LessonPage() {
       {/* Quiz Result */}
       {result && (
         <div className="card">
+
+          
           <h3>Result</h3>
           <p>Score: {result.score}%</p>
           <p>

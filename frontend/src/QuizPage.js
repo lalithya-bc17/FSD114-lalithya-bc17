@@ -10,7 +10,7 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
 
-  // Load quiz on mount
+  // Load quiz
   useEffect(() => {
     getQuiz(id)
       .then((data) => setQuiz(data))
@@ -22,12 +22,17 @@ export default function QuizPage() {
   };
 
   const handleSubmit = async () => {
+    if (Object.keys(answers).length === 0) {
+      alert("❌ Please select at least one answer before submitting");
+      return;
+    }
+
     try {
       const res = await submitQuiz(id, answers);
       setResult(res);
 
       if (res.passed) {
-        alert("🎉 Quiz passed! Next lesson unlocked!");
+        alert("🎉 Quiz passed!");
       } else {
         alert("❌ Some answers are wrong. Try again.");
       }
@@ -38,7 +43,7 @@ export default function QuizPage() {
 
   if (!quiz) return <p>Loading quiz...</p>;
 
-  // ✅ Lock quiz if already passed
+  // Lock quiz if already passed
   if (quiz.locked) {
     return <h2>✅ Quiz already passed</h2>;
   }
@@ -48,32 +53,44 @@ export default function QuizPage() {
       <h2>{quiz.title}</h2>
 
       {quiz.questions.map((q) => (
-        <div key={q.id} className="card" style={{ padding: "10px", margin: "10px 0" }}>
+        <div
+          key={q.id}
+          className="card"
+          style={{ padding: "10px", margin: "10px 0" }}
+        >
           <h4>{q.text}</h4>
 
           {["a", "b", "c", "d"].map((key) => {
             let bg = "";
 
-            // ✅ Safely highlight correct/wrong after submit
             if (result?.details) {
-              const r = result.details.find((d) => d.question_id === q.id);
+              const r = result.details.find(
+                (d) => d.question_id === q.id
+              );
               if (r) {
-                if (key.toUpperCase() === r.correct) bg = "#c8f7c5"; // green
-                else if (key.toUpperCase() === r.selected) bg = "#f7c5c5"; // red
+                if (key.toUpperCase() === r.correct) bg = "#c8f7c5";
+                else if (key.toUpperCase() === r.selected) bg = "#f7c5c5";
               }
             }
 
             return (
               <label
                 key={key}
-                style={{ display: "block", background: bg, padding: "5px", margin: "5px 0" }}
+                style={{
+                  display: "block",
+                  background: bg,
+                  padding: "5px",
+                  margin: "5px 0",
+                }}
               >
                 <input
                   type="radio"
                   name={q.id}
                   disabled={!!result}
                   checked={answers[q.id] === key.toUpperCase()}
-                  onChange={() => selectAnswer(q.id, key.toUpperCase())}
+                  onChange={() =>
+                    selectAnswer(q.id, key.toUpperCase())
+                  }
                 />
                 {q[key]}
               </label>
@@ -92,6 +109,44 @@ export default function QuizPage() {
         <div style={{ marginTop: 20 }}>
           <h3>Score: {result.score}%</h3>
           <p>{result.passed ? "✅ Passed" : "❌ Failed"}</p>
+
+          {/* ✅ Resume Next Lesson */}
+          {result.passed && result.next_lesson_id && (
+            <button
+              onClick={() =>
+                navigate(`/lesson/${result.next_lesson_id}`)
+              }
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              ▶ Resume Next Lesson
+            </button>
+          )}
+
+          {/* 🎓 Certificate / Dashboard Redirect */}
+          {result.passed && !result.next_lesson_id && (
+            <button
+              onClick={() => navigate("/dashboard")}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#2196F3",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              🎓 Go to Dashboard / Download Certificate
+            </button>
+          )}
         </div>
       )}
     </div>

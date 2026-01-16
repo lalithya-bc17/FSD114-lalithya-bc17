@@ -6,6 +6,40 @@ import "./styles.css";
 export default function Dashboard() {
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
+  const downloadCertificate = async (courseId, courseTitle) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/certificate/${courseId}/`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      alert("Unable to download certificate.");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${courseTitle}_certificate.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (err) {
+    console.error(err);
+    alert("Certificate download failed.");
+  }
+};
+
 
   useEffect(() => {
     const load = async () => {
@@ -66,28 +100,35 @@ export default function Dashboard() {
               {course.completed}/{course.total} lessons completed
             </p>
 
-            <button
-              onClick={() => handleView(course)}
-              className={isCompleted ? "lesson-completed" : "lesson-open"}
-            >
-              {isCompleted ? "Completed" : "View Lessons"}
-            </button>
-
-            <button onClick={() => handleResume(course)} disabled={isCompleted}>
-              {isCompleted ? "Completed" : "Resume"}
-            </button>
-
-            {/* 🎓 CERTIFICATE BUTTON */}
-            {isCompleted && (
-              <a
-                href={`http://127.0.0.1:8000/api/certificate/${course.course_id}/`}
-                target="_blank"
-                rel="noreferrer"
+            {/* MAIN BUTTON */}
+            {!isCompleted ? (
+              <button onClick={() => handleView(course)} className="lesson-open">
+                View Lessons
+              </button>
+            ) : (
+              <button
+              className="lesson-completed blue-completed"
+              onClick={() => alert("🎉 You have completed all lessons in this course!")}
               >
-                <button className="certificate-btn">
-                  🎓 Download Certificate
-                </button>
-              </a>
+               Completed
+              </button>
+            )}
+
+            {/* RESUME BUTTON (ONLY IF NOT COMPLETED) */}
+            {!isCompleted && (
+              <button onClick={() => handleResume(course)}>
+                Resume
+              </button>
+            )}
+
+            {/* 🎓 CERTIFICATE BUTTON (ONLY IF COMPLETED) */}
+            {isCompleted && (
+              <button
+              className="certificate-btn"
+              onClick={() => downloadCertificate(course.course_id, course.course)}
+              >
+              🎓 Download Certificate
+              </button>
             )}
           </div>
         );

@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -302,37 +303,38 @@ def resume_course(request, course_id):
 # -----------------------------
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated, IsStudent])
+@permission_classes([IsAuthenticated])
 def submit_quiz(request, quiz_id):
     student = request.user.student
     quiz = get_object_or_404(Quiz, id=quiz_id)
     answers = request.data.get("answers", {})
 
     total = quiz.questions.count()
-
-    # ❌ No answers submitted
     if not answers:
         return Response({"error": "No answers submitted"}, status=400)
 
     correct = 0
     result = []
 
-    for q in quiz.questions.all():
-        selected = str(answers.get(str(q.id), "")).strip().upper()
-        correct_option = q.correct.strip().upper()
+    # Evaluate answers
+    import re
 
+    for q in quiz.questions.all():
+        selected = str(answers.get(str(q.id), "")).strip().lower()
+        correct_option = re.sub(r'[^a-z]', '', q.correct.strip().lower())
         is_correct = selected == correct_option
 
         if is_correct:
-            correct += 1
+           correct += 1
 
         result.append({
-            "question_id": q.id,
-            "selected": selected,
-            "correct": correct_option,
-            "is_correct": is_correct
+           "question_id": q.id,
+           "selected": selected,
+           "correct": correct_option,
+           "is_correct": is_correct
         })
 
+        # Save StudentAnswer
         StudentAnswer.objects.update_or_create(
             student=student,
             question=q,
@@ -342,8 +344,11 @@ def submit_quiz(request, quiz_id):
     score = int((correct / total) * 100)
     passed = score >= 60
 
-    # Only now unlock lesson
+    next_lesson_id = None
+    all_lessons_completed = False
+
     if passed:
+        # Mark current lesson as completed
         lesson = get_object_or_404(Lesson, quiz=quiz)
         Progress.objects.update_or_create(
             student=student,
@@ -351,13 +356,30 @@ def submit_quiz(request, quiz_id):
             defaults={"completed": True}
         )
 
+        # Try to find next lesson by order
+        next_lesson = Lesson.objects.filter(
+            course=lesson.course,
+            order__gt=lesson.order
+        ).order_by("order").first()
+
+        # Fallback: if order is duplicate, pick by id
+        if not next_lesson:
+            next_lesson = Lesson.objects.filter(
+                course=lesson.course,
+                id__gt=lesson.id
+            ).order_by("id").first()
+
+        if next_lesson:
+            next_lesson_id = next_lesson.id
+        else:
+            all_lessons_completed 
     return Response({
         "score": score,
         "passed": passed,
-        "details": result
+        "details": result,
+        "next_lesson_id": next_lesson_id,
+        "all_lessons_completed": all_lessons_completed
     })
-
-
 # -----------------------------
 # PHASE-4B — STUDENT DASHBOARD UI
 # -----------------------------
@@ -409,31 +431,40 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Course, Progress
 from core.permissions import IsStudent  # if you have this
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.utils.timezone import now
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated, IsStudent])
+@permission_classes([IsAuthenticated])
 def certificate(request, course_id):
     student = request.user.student
-    course = Course.objects.get(id=course_id)
+    course = get_object_or_404(Course, id=course_id)
 
+    # Check if all lessons are completed
     total = course.lessons.count()
-    done = Progress.objects.filter(student=student, lesson__course=course, completed=True).count()
+    done = Progress.objects.filter(
+        student=student,
+        lesson__course=course,
+        completed=True
+    ).count()
 
     if done != total:
-        return Response({"error": "Course not completed"}, status=403)
+        return HttpResponse("You have not completed this course.", status=403)
 
-    response = HttpResponse(content_type="application/pdf")
+    # Render HTML template
+    html_string = render_to_string("courses/certificate_template.html", {
+        "student_name": student.user.get_full_name() or student.user.username,
+        "course_name": course.title,   # ✅ fixed variable name
+        "date": now().strftime("%d %B %Y"),
+    })
+
+    # Generate PDF
+    html = HTML(string=html_string)
+    pdf = html.write_pdf()
+
+    response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{course.title}_certificate.pdf"'
-
-    p = canvas.Canvas(response, pagesize=A4)
-    p.setFont("Helvetica-Bold", 24)
-    p.drawString(100, 700, "Certificate of Completion")
-
-    p.setFont("Helvetica", 18)
-    p.drawString(100, 650, student.user.username)
-    p.drawString(100, 620, f"has completed {course.title}")
-
-    p.save()
     return response
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
