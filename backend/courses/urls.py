@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 from courses.views import certificate
+from .views import verify_certificate
+
 
 urlpatterns = [
 
@@ -35,4 +37,5 @@ urlpatterns = [
     path("student/lesson/<int:lesson_id>/complete/", views.mark_lesson_completed),
     path("quiz/<int:quiz_id>/", views.quiz_detail),
     path("certificate/<int:course_id>/", views.certificate, name="certificate"),
+    path("verify-certificate/<uuid:id>/", views.verify_certificate, name="verify_certificate"),
 ]

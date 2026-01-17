@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Certificate Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f9fc; padding: 40px; }
+        .box {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 { color: #1B9AAA; }
+        .label { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>✅ Certificate Verified</h2>
+        <p><span class="label">Student:</span> {{ student }}</p>
+        <p><span class="label">Course:</span> {{ course }}</p>
+        <p><span class="label">Issued on:</span> {{ date }}</p>
+        <p><span class="label">Certificate ID:</span> {{ certificate_id }}</p>
+    </div>
+</body>
+</html>

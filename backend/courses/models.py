@@ -1,5 +1,6 @@
 from django.db import models
 from core.models import Student, Teacher
+import uuid
 
 
 class Course(models.Model):
@@ -79,3 +80,16 @@ class Progress(models.Model):
 
         def __str__(self):
             return f"{self.student} - {self.lesson} : {'Completed' if self.completed else 'Incomplete'}"
+
+from django.db import models
+from django.contrib.auth.models import User
+from courses.models import Course  # adjust if needed
+
+class Certificate(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    issued_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.course.title}"

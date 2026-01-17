@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from core.models import Student
 from core.permissions import IsStudent
+from .models import Certificate
 
 from .models import (
     Course, Lesson, Enrollment, Progress,
@@ -434,17 +435,36 @@ from core.permissions import IsStudent  # if you have this
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.utils.timezone import now
+import os
+from django.conf import settings
+import os
+import base64
+import qrcode
+from io import BytesIO
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.utils.timezone import now
+from django.urls import reverse
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from weasyprint import HTML
+
+from .models import Course, Progress, Certificate
+from django.conf import settings
+
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def certificate(request, course_id):
-    student = request.user.student
+    user = request.user                  # ✅ User
+    student = request.user.student       # ✅ Student profile
+
     course = get_object_or_404(Course, id=course_id)
 
-    # Check if all lessons are completed
     total = course.lessons.count()
     done = Progress.objects.filter(
-        student=student,
+        student=student,                 # Student model
         lesson__course=course,
         completed=True
     ).count()
@@ -452,14 +472,39 @@ def certificate(request, course_id):
     if done != total:
         return HttpResponse("You have not completed this course.", status=403)
 
-    # Render HTML template
-    html_string = render_to_string("courses/certificate_template.html", {
-        "student_name": student.user.get_full_name() or student.user.username,
-        "course_name": course.title,   # ✅ fixed variable name
-        "date": now().strftime("%d %B %Y"),
-    })
+    certificate_obj, created = Certificate.objects.get_or_create(
+        student=user,                    # ✅ User model (matches Certificate)
+        course=course,
+    )
 
-    # Generate PDF
+    verify_url = request.build_absolute_uri(
+    reverse("verify_certificate", args=[certificate_obj.id])
+)
+    
+
+    qr = qrcode.make(verify_url)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    def file_path(path):
+        return "file:///" + path.replace("\\", "/")
+
+    logo_path = file_path(os.path.join(settings.BASE_DIR, "static", "brand", "logo.png"))
+    people_icon = file_path(os.path.join(settings.BASE_DIR, "static", "brand", "people.png"))
+
+    html_string = render_to_string(
+        "courses/certificate_template.html",
+        {
+            "student_name": user.get_full_name() or user.username,
+            "course_name": course.title,
+            "date": now().strftime("%d %B %Y"),
+            "logo_path": logo_path,
+            "people_icon": people_icon,
+            "qr_base64": qr_base64,
+        }
+    )
+
     html = HTML(string=html_string)
     pdf = html.write_pdf()
 
@@ -477,3 +522,14 @@ def mark_lesson_completed(request, lesson_id):
     progress.save()
 
     return Response({"success": True})
+from django.shortcuts import get_object_or_404, render
+from .models import Certificate
+
+def verify_certificate(request, id):
+    cert = get_object_or_404(Certificate, id=id)
+    return render(request, "courses/verify_certificate.html", {
+        "student": cert.student.get_full_name() or cert.student.username,
+        "course": cert.course.title,
+        "date": cert.issued_at,
+        "certificate_id": cert.id,
+    })

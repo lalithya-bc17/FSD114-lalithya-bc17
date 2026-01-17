@@ -145,3 +145,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 # MEDIA files (videos, images, PDFs)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
