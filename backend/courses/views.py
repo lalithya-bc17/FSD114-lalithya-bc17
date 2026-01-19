@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from core.models import Student
 from core.permissions import IsStudent
 from .models import Certificate
+import hashlib
+from django.conf import settings
 
 from .models import (
     Course, Lesson, Enrollment, Progress,
@@ -476,13 +478,15 @@ def certificate(request, course_id):
         student=user,                    # ✅ User model (matches Certificate)
         course=course,
     )
+    # 🚫 Block revoked certificates from downloading
+    
     if not certificate_obj.issued_at:
         certificate_obj.issued_at = now()
         certificate_obj.save()
     
-    verify_url = request.build_absolute_uri(
-    reverse("verify_certificate", args=[certificate_obj.id])
-   )
+    RENDER_BASE_URL = "https://certificate-verification-backend-7gpb.onrender.com"
+
+    verify_url = f"https://certificate-verification-backend-7gpb.onrender.com/verify-certificate/{certificate_obj.id}/" 
     print("VERIFY URL:", verify_url)
     
 
@@ -533,26 +537,36 @@ from django.shortcuts import get_object_or_404, render
 
 from django.shortcuts import render, get_object_or_404
 from .models import Certificate
-
 def verify_certificate(request, id):
     try:
         certificate = Certificate.objects.get(id=id)
     except Certificate.DoesNotExist:
-        # ❌ Invalid certificate
-        return render(request, "courses/invalid_certificate.html")
+        return render(request, "courses/verify_certificate.html", {
+            "status": "invalid"
+        })
 
     if certificate.is_revoked:
-        # 🚫 Revoked certificate
-        return render(request, "courses/revoked_certificate.html", {
+        return render(request, "courses/verify_certificate.html", {
+            "status": "revoked",
             "certificate_id": certificate.id
         })
 
-    # ✅ Valid certificate
-    context = {
+    return render(request, "courses/verify_certificate.html", {
+        "status": "valid",
         "student": certificate.student.get_full_name() or certificate.student.username,
         "course": certificate.course.title,
-        "issued_on": certificate.issued_at.strftime("%d %B %Y") if certificate.issued_at else "—",
+        "issued_at": certificate.issued_at.strftime("%d %B %Y") if certificate.issued_at else "—",
         "certificate_id": certificate.id,
-    }
+    })
+import hashlib
+from django.conf import settings
 
-    return render(request, "courses/verify_certificate.html", context)
+def generate_hash(certificate):
+    raw = f"{certificate.id}|{certificate.student_id}|{certificate.course_id}|{settings.SECRET_KEY}"
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # first save to get ID
+        if not self.hash:
+            self.hash = generate_hash(self)
+            super().save(update_fields=["hash"])

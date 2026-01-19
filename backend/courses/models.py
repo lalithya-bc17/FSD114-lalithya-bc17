@@ -90,8 +90,24 @@ class Certificate(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     issued_at = models.DateTimeField(auto_now_add=True)
-    is_revoked = models.BooleanField(default=False)  # 🔒 SECURITY FLAG
+    is_revoked = models.BooleanField(default=False)
+    hash = models.CharField(max_length=64, blank=True, null=True)  # 🔒 SECURITY FLAG
     class Meta:
         unique_together = ("student", "course")
     def __str__(self):
         return f"{self.student.username} - {self.course.title}"
+   
+import hashlib
+from django.conf import settings
+
+def generate_hash(certificate):
+    raw = f"{certificate.id}|{certificate.student_id}|{certificate.course_id}|{settings.SECRET_KEY}"
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)   # save first → get ID
+        if not self.hash:
+            self.hash = generate_hash(self)
+            super().save(update_fields=["hash"])
