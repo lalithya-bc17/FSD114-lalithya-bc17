@@ -9,12 +9,13 @@ from rest_framework.response import Response
 from core.models import Student
 from core.permissions import IsStudent
 from .models import Certificate
-import hashlib
-from django.conf import settings
+from django.contrib.auth.decorators import login_required
+
+
 
 from .models import (
     Course, Lesson, Enrollment, Progress,
-    Quiz, Question, StudentAnswer
+    Quiz, Question, StudentAnswer, Announcement
 )
 from .serializers import CourseSerializer, LessonSerializer
 
@@ -106,6 +107,19 @@ def lesson_detail(request, lesson_id):
         return Response({"detail": "Locked"}, status=403)
 
     return Response(LessonSerializer(lesson).data)
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def lesson_detail_page(request, lesson_id):
+    student = request.user.student  # now safe
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+
+    if not is_lesson_unlocked(student, lesson):
+        return render(request, "courses/lesson_locked.html")
+
+    return render(request, "courses/lesson_detail.html", {
+        "lesson": lesson
+    })
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsStudent])
 def quiz_detail(request, quiz_id):
@@ -558,15 +572,21 @@ def verify_certificate(request, id):
         "issued_at": certificate.issued_at.strftime("%d %B %Y") if certificate.issued_at else "—",
         "certificate_id": certificate.id,
     })
-import hashlib
-from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
-def generate_hash(certificate):
-    raw = f"{certificate.id}|{certificate.student_id}|{certificate.course_id}|{settings.SECRET_KEY}"
-    return hashlib.sha256(raw.encode()).hexdigest()
+@login_required
+def lesson_detail_page(request, lesson_id):
+    student = request.user.student  # now safe
+    lesson = get_object_or_404(Lesson, id=lesson_id)
 
-def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # first save to get ID
-        if not self.hash:
-            self.hash = generate_hash(self)
-            super().save(update_fields=["hash"])
+    if not is_lesson_unlocked(student, lesson):
+        return render(request, "courses/lesson_locked.html")
+
+    return render(request, "courses/lesson_detail.html", {
+        "lesson": lesson
+    })
+def announcements_page(request):
+    announcements = Announcement.objects.order_by('-created_at')
+    return render(request, "courses/announcements.html", {
+        "announcements": announcements
+    })

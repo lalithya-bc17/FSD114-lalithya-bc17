@@ -17,7 +17,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     order = models.IntegerField(default=1)
-    video = models.FileField(upload_to="lesson_videos/", blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True)
     # One quiz per lesson
     quiz = models.OneToOneField("Quiz", on_delete=models.SET_NULL, null=True, blank=True, related_name="lesson")
 
@@ -91,23 +91,17 @@ class Certificate(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     issued_at = models.DateTimeField(auto_now_add=True)
     is_revoked = models.BooleanField(default=False)
-    hash = models.CharField(max_length=64, blank=True, null=True)  # 🔒 SECURITY FLAG
+      # 🔒 SECURITY FLAG
     class Meta:
         unique_together = ("student", "course")
     def __str__(self):
         return f"{self.student.username} - {self.course.title}"
+    
+class Announcement(models.Model):
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
    
-import hashlib
-from django.conf import settings
-
-def generate_hash(certificate):
-    raw = f"{certificate.id}|{certificate.student_id}|{certificate.course_id}|{settings.SECRET_KEY}"
-    return hashlib.sha256(raw.encode()).hexdigest()
-
-
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)   # save first → get ID
-        if not self.hash:
-            self.hash = generate_hash(self)
-            super().save(update_fields=["hash"])
