@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getLesson } from "./api";
 import "./styles.css";
 
 export default function LessonPage() {
@@ -11,15 +10,22 @@ export default function LessonPage() {
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [completed, setCompleted] = useState(false);
-  const [videoDone, setVideoDone] = useState(false); // ✅ track video finished
+  const [videoDone, setVideoDone] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // ✅ FETCH LESSON WITH JWT TOKEN
   useEffect(() => {
     setLoading(true);
-    getLesson(id)
+
+    fetch(`http://127.0.0.1:8000/api/student/lesson/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
       .then((data) => {
-        setLesson(data || {});
-        setCompleted(false); // reset when new lesson loads
+        setLesson(data);
+        setCompleted(false);
         setVideoDone(false);
         setAnswers({});
         setResult(null);
@@ -27,7 +33,7 @@ export default function LessonPage() {
       })
       .catch((err) => {
         console.error("Lesson fetch error:", err);
-        setLesson({});
+        setLesson(null);
         setLoading(false);
       });
   }, [id]);
@@ -37,28 +43,29 @@ export default function LessonPage() {
     setAnswers({ ...answers, [qid]: opt });
   };
 
-  // ✅ Mark lesson as completed when video ends
+  // ✅ MARK LESSON COMPLETED AFTER VIDEO
   const handleVideoEnd = async () => {
     try {
-      await fetch(`http://127.0.0.1:8000/api/student/lesson/${lesson.id}/complete/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      await fetch(
+        `http://127.0.0.1:8000/api/student/lesson/${lesson.id}/complete/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-      setVideoDone(true); // mark video locally complete
-      setCompleted(true); // unlock quiz
+      setVideoDone(true);
+      setCompleted(true);
     } catch (err) {
       console.error("Failed to mark lesson completed:", err);
-      alert("Could not mark lesson as completed. Try again.");
+      alert("Could not mark lesson completed");
     }
   };
 
   if (loading) return <p>Loading lesson...</p>;
-  if (!lesson || Object.keys(lesson).length === 0)
-    return <p>Lesson not found</p>;
+  if (!lesson) return <p>Lesson not found</p>;
 
   return (
     <div className="container">
@@ -68,30 +75,27 @@ export default function LessonPage() {
       </button>
 
       {/* Lesson Title */}
-      <h2>{lesson.title || "Untitled Lesson"}</h2>
+      <h2>{lesson.title}</h2>
 
-      {/* Video */}
-      {lesson.video && (
-        <video
-          width="100%"
-          controls
-          src={`http://127.0.0.1:8000${lesson.video}`}
-          onEnded={handleVideoEnd} // unlock quiz after video ends
-        />
+      {/* ✅ CLOUDINARY VIDEO (FIXED) */}
+      {lesson.video_url && (
+        <video width="100%" controls onEnded={handleVideoEnd}>
+          <source src={lesson.video_url} type="video/mp4" />
+        </video>
       )}
 
-      {/* Video Completed Check */}
+      {/* Video Completed */}
       {videoDone && <p className="alert">✅ Video Completed</p>}
 
       {/* Lesson Content */}
-      <p>{lesson.content || "No content available."}</p>
+      <p>{lesson.content}</p>
 
       {/* Quiz Header */}
       <h3>Quiz {completed ? "✅" : "🔒"}</h3>
 
-      {/* Quiz Content */}
+      {/* Quiz Section */}
       {completed ? (
-        lesson.questions && lesson.questions.length > 0 ? (
+        lesson.questions?.length > 0 ? (
           lesson.questions.map((q) => (
             <div key={q.id} className="card">
               <p>{q.text}</p>
@@ -110,13 +114,13 @@ export default function LessonPage() {
             </div>
           ))
         ) : (
-          <p className="alert">Click start Quiz</p>
+          <p>Start Quiz</p>
         )
       ) : (
         <p className="alert">🔒 Watch the video to unlock the quiz.</p>
       )}
 
-      {/* Start Quiz Button */}
+      {/* Start Quiz */}
       {lesson.quiz_id && (
         <button
           onClick={() => navigate(`/quiz/${lesson.quiz_id}`)}
@@ -126,11 +130,9 @@ export default function LessonPage() {
         </button>
       )}
 
-      {/* Quiz Result */}
+      {/* Result */}
       {result && (
         <div className="card">
-
-          
           <h3>Result</h3>
           <p>Score: {result.score}%</p>
           <p>

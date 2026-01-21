@@ -109,17 +109,7 @@ def lesson_detail(request, lesson_id):
     return Response(LessonSerializer(lesson).data)
 from django.contrib.auth.decorators import login_required
 
-@login_required
-def lesson_detail_page(request, lesson_id):
-    student = request.user.student  # now safe
-    lesson = get_object_or_404(Lesson, id=lesson_id)
 
-    if not is_lesson_unlocked(student, lesson):
-        return render(request, "courses/lesson_locked.html")
-
-    return render(request, "courses/lesson_detail.html", {
-        "lesson": lesson
-    })
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsStudent])
 def quiz_detail(request, quiz_id):
@@ -574,14 +564,12 @@ def verify_certificate(request, id):
     })
 from django.contrib.auth.decorators import login_required
 
-@login_required
+
+from django.shortcuts import render, get_object_or_404
+from .models import Lesson
+
 def lesson_detail_page(request, lesson_id):
-    student = request.user.student  # now safe
     lesson = get_object_or_404(Lesson, id=lesson_id)
-
-    if not is_lesson_unlocked(student, lesson):
-        return render(request, "courses/lesson_locked.html")
-
     return render(request, "courses/lesson_detail.html", {
         "lesson": lesson
     })
