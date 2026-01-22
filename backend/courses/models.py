@@ -89,7 +89,7 @@ class Certificate(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    issued_at = models.DateTimeField(auto_now_add=True)
+    issued_at = models.DateTimeField(blank=True, null=True)
     is_revoked = models.BooleanField(default=False)
       # 🔒 SECURITY FLAG
     class Meta:

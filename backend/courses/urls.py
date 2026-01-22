@@ -40,4 +40,5 @@ urlpatterns = [
     name="lesson-detail"
 ),
     path("announcements/", views.announcements_page, name="announcements"),
+    path("notifications/", views.notifications_page, name="notifications"),
 ]

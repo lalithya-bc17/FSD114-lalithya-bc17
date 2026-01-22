@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
+from flask import request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,6 +11,7 @@ from core.models import Student
 from core.permissions import IsStudent
 from .models import Certificate
 from django.contrib.auth.decorators import login_required
+from .models import Notification
 
 
 
@@ -482,12 +484,20 @@ def certificate(request, course_id):
         student=user,                    # ✅ User model (matches Certificate)
         course=course,
     )
+    if created:
+       Notification.objects.create(
+        user=request.user,
+        message="Your certificate has been generated ✅"
+    )
+    
+
     # 🚫 Block revoked certificates from downloading
     
     if not certificate_obj.issued_at:
         certificate_obj.issued_at = now()
         certificate_obj.save()
-    
+
+
     RENDER_BASE_URL = "https://certificate-verification-backend-7gpb.onrender.com"
 
     verify_url = f"https://certificate-verification-backend-7gpb.onrender.com/verify-certificate/{certificate_obj.id}/" 
@@ -530,10 +540,17 @@ def mark_lesson_completed(request, lesson_id):
     lesson = Lesson.objects.get(id=lesson_id)
 
     progress, created = Progress.objects.get_or_create(student=student, lesson=lesson)
-    progress.completed = True
-    progress.save()
+    if not progress.completed:
+       progress.completed = True
+       progress.save()
 
+    Notification.objects.create(
+        user=request.user,
+        message="You have successfully completed a lesson 🎉"
+    )
     return Response({"success": True})
+
+
 from django.shortcuts import get_object_or_404, render
 from .models import Certificate
 
@@ -554,6 +571,7 @@ def verify_certificate(request, id):
             "status": "revoked",
             "certificate_id": certificate.id
         })
+    
 
     return render(request, "courses/verify_certificate.html", {
         "status": "valid",
@@ -573,8 +591,19 @@ def lesson_detail_page(request, lesson_id):
     return render(request, "courses/lesson_detail.html", {
         "lesson": lesson
     })
+
 def announcements_page(request):
     announcements = Announcement.objects.order_by('-created_at')
     return render(request, "courses/announcements.html", {
         "announcements": announcements
+    })
+
+from django.contrib.auth.decorators import login_required
+from .models import Notification
+
+@login_required
+def notifications_page(request):
+    notifications = Notification.objects.all().order_by('-created_at')
+    return render(request, "courses/notifications.html", {
+        "notifications": notifications
     })
