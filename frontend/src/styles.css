@@ -1,437 +1,179 @@
-/* ==============================
-   CIVORA NEXUS DESIGN SYSTEM
-================================ */
-
-:root {
-  --primary: #1B9AAA;
-  --primary-dark: #16808D;
-  --navy: #142C52;
-
-  --bg: #F4F7FA;
-  --surface: #FFFFFF;
-  --border: #E5E7EB;
-
-  --text-dark: #071426;
-  --text-muted: #6B7280;
-
-  --success: #22C55E;
-  --success-dark: #178740;
-
-  --danger: #EF4444;
-}
-
-/* ==============================
-   GLOBAL
-================================ */
-
-* {
-  box-sizing: border-box;
-}
-
+/* ---------- GENERAL ---------- */
 body {
-  margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--bg);
-  color: var(--text-dark);
-}
-
-a {
-  text-decoration: none;
-  color: var(--primary);
-}
-
-/* ==============================
-   LAYOUT
-================================ */
-
-.container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 24px;
-  background: var(--surface);
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-}
-
-/* ==============================
-   HEADINGS
-================================ */
-
-h1, h2, h3 {
-  color: var(--navy);
-  margin-bottom: 16px;
-}
-
-h2 {
-  font-size: 24px;
-}
-
-h3 {
-  font-size: 18px;
-}
-
-/* ==============================
-   CARDS
-================================ */
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px 20px;
-  margin-bottom: 20px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-}
-
-/* ==============================
-   BUTTONS
-================================ */
-
-button {
-  background: var(--primary-dark);
-  color: #fff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-button:hover {
-  background: var(--primary);
-  transform: translateY(-1px);
-}
-
-button:disabled {
-  background: #CBD5E1;
-  cursor: not-allowed;
-}
-
-/* Secondary button */
-button.back {
-  background: #E5E7EB;
-  color: var(--text-dark);
-}
-
-button.back:hover {
-  background: #D1D5DB;
-}
-
-/* ==============================
-   DASHBOARD PROGRESS
-================================ */
-
-.progress {
-  width: 100%;
-  height: 10px;
-  background: #E5E7EB;
-  border-radius: 999px;
-  overflow: hidden;
-  margin: 10px 0;
-}
-
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--success), #16A34A);
-  width: 0%;
-  transition: width 0.4s ease;
-}
-
-/* ==============================
-   COURSE STATUS
-================================ */
-
-.lesson-completed-dark {
-  background: var(--navy);
-  color: #fff;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 13px;
-}
-
-.blue-completed {
-  background: var(--navy) !important;
-  color: #fff !important;
-}
-
-/* Certificate button */
-.certificate-btn {
-  background: var(--navy);
-  color: #fff;
-  border-radius: 8px;
-  padding: 10px 16px;
-  margin-top: 8px;
-}
-
-/* ==============================
-   FORMS
-================================ */
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-label {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-input {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  font-size: 14px;
-}
-
-input:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-/* ==============================
-   VIDEO
-================================ */
-
-video {
-  width: 100%;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  background: #000;
-}
-
-/* ==============================
-   NOTIFICATIONS
-================================ */
-
-.notification {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 18px;
-  border-radius: 12px;
-  background: #F8FAFC;
-  border: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-
-.notification.unread {
-  border-left: 4px solid var(--primary);
-  background: #ECFEFF;
-}
-
-.notification.read {
-  opacity: 0.7;
-}
-
-/* ==============================
-   ALERTS
-================================ */
-
-.alert {
-  color: var(--danger);
-  font-weight: 600;
-  margin-top: 12px;
-}
-
-/* ==============================
-   FOOTER (OPTIONAL)
-================================ */
-
-.footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-/* ===== COURSE CARD FIX ===== */
-
-.course-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px 18px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-/* Course title */
-.course-card h3 {
-  margin: 0;
-  font-size: 18px;
-  color: #142c52; /* navy */
-  font-weight: 600;
-}
-
-/* Progress text */
-.course-progress-text {
-  font-size: 13px;
-  color: #555;
-  margin: 6px 0 8px;
-}
-
-/* Progress bar container */
-.course-progress {
-  width: 100%;
-  height: 10px;              /* NOT thick, NOT thin */
-  background: #e5e7eb;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-/* Progress fill */
-.course-progress-fill {
-  height: 100%;
-  background: #22c55e;
-  border-radius: 6px;
-}
-/* Full-width layout for dashboards */
-.dashboard-container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 20px;
-}
-
-/* If you want completely edge-to-edge */
-.full-width {
-  width: 100%;
-  padding: 20px 40px;
-}
-/* ===== DASHBOARD GRID (CONTROL WIDTH) ===== */
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-  max-width: 1100px;   /* controls overall width */
-  margin: 0 auto;     /* center dashboard */
-  padding: 20px;
-}
-.course-actions {
-  margin-top: 12px;
-  display: flex;
-  gap: 10px;
-}
-
-.course-actions button {
-  padding: 6px 12px;
-  font-size: 13px;
-  border-radius: 6px;
-}
-/* ===== PAGE ===== */
-body {
-  font-family: "Segoe UI", Tahoma, sans-serif;
-  background: #f4f7fa;
+  background: #f9f9f9;
   margin: 0;
   padding: 0;
 }
 
-.page-title {
-  text-align: center;
-  margin: 30px 0 10px;
-  color: #142c52;
-}
-
-/* ===== DASHBOARD GRID ===== */
-.dashboard-grid {
-  max-width: 1100px;
-  margin: 0 auto;
+.container {
+  max-width: 900px;
+  margin: 40px auto;
   padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-}
-
-/* ===== COURSE CARD ===== */
-.course-card {
-  background: #ffffff;
+  background: #fff;
   border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 }
 
-.course-card:hover {
-  transform: translateY(-3px);
+/* ---------- HEADINGS ---------- */
+h2 {
+  color: #333;
+  margin-bottom: 20px;
 }
 
-.course-title {
-  margin: 0 0 12px;
-  color: #142c52;
+h3 {
+  color: #555;
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
-/* ===== PROGRESS ===== */
-.progress-container {
+/* ---------- CARDS ---------- */
+.card {
+  background: #fafafa;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ---------- BUTTONS ---------- */
+button {
+  background: #4f46e5; /* Indigo-600 */
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #4338ca; /* Indigo-700 */
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* ---------- PROGRESS BAR ---------- */
+.progress-bg {
+  background: #e5e7eb; /* Gray-200 */
+  border-radius: 8px;
+  height: 12px;
   width: 100%;
-  height: 10px;
-  background: #e5e7eb;
-  border-radius: 6px;
+  margin: 10px 0;
   overflow: hidden;
-  margin-bottom: 8px;
+}
+
+.progress-fill {
+  background: #4f46e5; /* Indigo-600 */
+  height: 100%;
+  width: 0;
+  border-radius: 8px;
+  transition: width 0.5s ease;
+}
+
+/* ---------- FORM ---------- */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+/* ---------- QUIZ ---------- */
+.card input[type="radio"] {
+  margin-right: 8px;
+}
+
+/* ---------- BACK BUTTON ---------- */
+button.back {
+  background: #f3f4f6;
+  color: #111;
+  margin-bottom: 20px;
+}
+
+button.back:hover {
+  background: #e5e7eb;
+}
+
+/* ---------- VIDEO ---------- */
+video {
+  border-radius: 10px;
+  margin-bottom: 15px;
+  background: #000;
+}
+
+/* ---------- ALERTS ---------- */
+.alert {
+  color: #b91c1c; /* Red-700 */
+  font-weight: 500;
+  margin-top: 10px;
+}
+/* Dashboard progress bar */
+
+.progress {
+  width: 100%;
+  height: 12px;
+  background: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 8px 0;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #22c55e, #16a34a);
-  border-radius: 6px;
-  transition: width 0.4s ease;
+  background: linear-gradient(90deg, #4caf50, #2ecc71);
+  width: 0%;
+  transition: width 0.5s ease;
 }
-
-.progress-text {
-  font-size: 13px;
-  color: #555;
-  margin-bottom: 12px;
-}
-
-/* ===== BUTTONS ===== */
-.course-actions {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.btn {
-  background: #1b9aaa;
+.progress-bar {
   color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  text-align: center;
+  line-height: 12px;
+  font-weight: bold;
 }
-
-.btn:hover {
-  background: #16808d;
+.blue-completed {
+  background-color: #1e3a8a !important;
+  color: white !important;
+  cursor: pointer;
 }
-
-.btn-secondary {
-  background: #142c52;
+.lesson-completed-dark {
+  background-color: #1e3a8a; /* dark blue */
   color: white;
-  padding: 8px 14px;
+  border: none;
+  padding: 10px 16px;
   border-radius: 6px;
-  text-decoration: none;
-  font-size: 13px;
+  cursor: default;
 }
 
-.btn-secondary:hover {
-  background: #0f223f;
-}
-
-/* ===== NOTIFICATION LINK ===== */
-.notification-link {
-  display: inline-block;
+.certificate-btn {
+  background-color: #1e3a8a; /* dark blue */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
   margin-top: 6px;
-  font-size: 13px;
-  color: #1b9aaa;
-  text-decoration: none;
-}
-
-.notification-link:hover {
-  text-decoration: underline;
+  cursor: pointer;
 }
