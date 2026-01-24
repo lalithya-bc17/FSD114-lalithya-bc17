@@ -1,179 +1,430 @@
-/* ---------- GENERAL ---------- */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f9f9f9;
-  margin: 0;
-  padding: 0;
+/* ==============================
+   CIVORA NEXUS DESIGN SYSTEM
+================================ */
+
+:root {
+  --primary: #1B9AAA;
+  --primary-dark: #16808D;
+  --navy: #142C52;
+
+  --bg: #F4F7FA;
+  --surface: #FFFFFF;
+  --border: #E5E7EB;
+
+  --text-dark: #071426;
+  --text-muted: #6B7280;
+
+  --success: #22C55E;
+  --danger: #EF4444;
 }
+
+/* ==============================
+   GLOBAL
+================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+}
+
+a {
+  text-decoration: none;
+  color: var(--primary);
+}
+
+/* ==============================
+   LAYOUT
+================================ */
 
 .container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 40px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
-/* ---------- HEADINGS ---------- */
-h2 {
-  color: #333;
+/* ==============================
+   HEADINGS
+================================ */
+
+h1, h2, h3 {
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+
+/* ==============================
+   GENERIC CARDS
+================================ */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
   margin-bottom: 20px;
 }
 
-h3 {
-  color: #555;
-  margin-top: 15px;
-  margin-bottom: 10px;
-}
+/* ==============================
+   GENERIC BUTTONS
+================================ */
 
-/* ---------- CARDS ---------- */
-.card {
-  background: #fafafa;
-  padding: 15px 20px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* ---------- BUTTONS ---------- */
 button {
-  background: #4f46e5; /* Indigo-600 */
+  background: var(--primary-dark);
   color: #fff;
   border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s;
 }
 
 button:hover {
-  background: #4338ca; /* Indigo-700 */
+  background: var(--primary);
 }
 
-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+button.back {
+  background: #E5E7EB;
+  color: var(--text-dark);
 }
 
-/* ---------- PROGRESS BAR ---------- */
-.progress-bg {
-  background: #e5e7eb; /* Gray-200 */
-  border-radius: 8px;
-  height: 12px;
-  width: 100%;
-  margin: 10px 0;
-  overflow: hidden;
-}
+/* ==============================
+   FORMS
+================================ */
 
-.progress-fill {
-  background: #4f46e5; /* Indigo-600 */
-  height: 100%;
-  width: 0;
-  border-radius: 8px;
-  transition: width 0.5s ease;
-}
-
-/* ---------- FORM ---------- */
 form {
   display: flex;
   flex-direction: column;
-}
-
-form div {
-  margin-bottom: 15px;
+  gap: 14px;
 }
 
 label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 input {
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  width: 100%;
+  border: 1px solid var(--border);
 }
 
-/* ---------- QUIZ ---------- */
-.card input[type="radio"] {
-  margin-right: 8px;
+input:focus {
+  outline: none;
+  border-color: var(--primary);
 }
 
-/* ---------- BACK BUTTON ---------- */
-button.back {
-  background: #f3f4f6;
-  color: #111;
-  margin-bottom: 20px;
-}
+/* ==============================
+   VIDEO
+================================ */
 
-button.back:hover {
-  background: #e5e7eb;
-}
-
-/* ---------- VIDEO ---------- */
 video {
-  border-radius: 10px;
-  margin-bottom: 15px;
+  width: 100%;
+  border-radius: 12px;
   background: #000;
 }
 
-/* ---------- ALERTS ---------- */
+/* ==============================
+   ALERTS
+================================ */
+
 .alert {
-  color: #b91c1c; /* Red-700 */
-  font-weight: 500;
-  margin-top: 10px;
+  color: var(--danger);
+  font-weight: 600;
 }
-/* Dashboard progress bar */
+
+/* ==============================
+   FOOTER
+================================ */
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+/* ==============================
+   CIVORA NEXUS DESIGN SYSTEM
+================================ */
+
+:root {
+  --primary: #1B9AAA;
+  --primary-dark: #16808D;
+  --navy: #142C52;
+
+  --bg: #F4F7FA;
+  --surface: #FFFFFF;
+  --border: #E5E7EB;
+
+  --text-dark: #071426;
+  --text-muted: #6B7280;
+
+  --success: #22C55E;
+  --success-dark: #178740;
+
+  --danger: #EF4444;
+}
+
+/* ==============================
+   GLOBAL
+================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+}
+
+a {
+  text-decoration: none;
+  color: var(--primary);
+}
+
+/* ==============================
+   LAYOUT
+================================ */
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ==============================
+   HEADINGS
+================================ */
+
+h1, h2, h3 {
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+/* ==============================
+   CARDS
+================================ */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* ==============================
+   BUTTONS
+================================ */
+
+button {
+  background: var(--primary-dark);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background: var(--primary);
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  background: #CBD5E1;
+  cursor: not-allowed;
+}
+
+/* Secondary button */
+button.back {
+  background: #E5E7EB;
+  color: var(--text-dark);
+}
+
+button.back:hover {
+  background: #D1D5DB;
+}
+
+/* ==============================
+   DASHBOARD PROGRESS
+================================ */
 
 .progress {
   width: 100%;
-  height: 12px;
-  background: #eee;
-  border-radius: 10px;
+  height: 10px;
+  background: #E5E7EB;
+  border-radius: 999px;
   overflow: hidden;
-  margin: 8px 0;
+  margin: 10px 0;
+}
+.progress-container {
+  width: 90%;              /* not full width */
+  height: 6px;             /* SMALL bar */
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0 6px 10px;  /* align with Python text */
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #4caf50, #2ecc71);
-  width: 0%;
-  transition: width 0.5s ease;
-}
-.progress-bar {
-  color: white;
-  font-size: 12px;
-  text-align: center;
-  line-height: 12px;
-  font-weight: bold;
-}
-.blue-completed {
-  background-color: #1e3a8a !important;
-  color: white !important;
-  cursor: pointer;
-}
-.lesson-completed-dark {
-  background-color: #1e3a8a; /* dark blue */
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  cursor: default;
+  background: linear-gradient(
+    90deg,
+    var(--success),
+    var(--success-dark)
+  );
+  border-radius: 4px;
+  transition: width 0.4s ease;
 }
 
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), #16A34A);
+  width: 0%;
+  transition: width 0.4s ease;
+}
+.progress-text {
+  margin-left: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ==============================
+   COURSE STATUS
+================================ */
+
+.lesson-completed-dark {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.blue-completed {
+  background: var(--navy) !important;
+  color: #fff !important;
+}
+
+/* Certificate button */
 .certificate-btn {
-  background-color: #1e3a8a; /* dark blue */
-  color: white;
-  border: none;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
   padding: 10px 16px;
-  border-radius: 6px;
-  margin-top: 6px;
-  cursor: pointer;
+  margin-top: 8px;
+}
+
+/* ==============================
+   FORMS
+================================ */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ==============================
+   VIDEO
+================================ */
+
+video {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  background: #000;
+}
+
+/* ==============================
+   NOTIFICATIONS
+================================ */
+
+.notification {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #F8FAFC;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.notification.unread {
+  border-left: 4px solid var(--primary);
+  background: #ECFEFF;
+}
+
+.notification.read {
+  opacity: 0.7;
+}
+
+/* ==============================
+   ALERTS
+================================ */
+
+.alert {
+  color: var(--danger);
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+/* ==============================
+   FOOTER (OPTIONAL)
+================================ */
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
 }
