@@ -42,14 +42,7 @@ a {
    LAYOUT
 ================================ */
 
-.container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 24px;
-  background: var(--surface);
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-}
+
 
 /* ==============================
    HEADINGS
@@ -64,13 +57,7 @@ h1, h2, h3 {
    GENERIC CARDS
 ================================ */
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px 20px;
-  margin-bottom: 20px;
-}
+
 
 /* ==============================
    GENERIC BUTTONS
@@ -151,24 +138,7 @@ video {
   color: var(--text-muted);
 }
 /* ===== COURSE HEADER LAYOUT ===== */
-.course-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-/* LEFT SIDE (Python + progress) */
-.course-info {
-  flex: 1;
-}
-
-/* Progress bar */
-
-/* Buttons on right */
-.course-actions {
-  display: flex;
-  gap: 10px;
-}
 /* ===== COURSE ROW (MAIN FIX) ===== */
 .course-row {
   display: flex;

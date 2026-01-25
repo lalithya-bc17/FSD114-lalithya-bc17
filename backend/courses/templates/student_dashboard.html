@@ -2,39 +2,44 @@
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
-<h1 class="page-title">My Learning</h1>
-
 <div class="dashboard-wrapper">
-  <div class="dashboard-grid">
 
+  <h1 class="page-title">My Learning</h1>
+
+  <div class="dashboard-grid">
     {% for c in dashboard %}
     <div class="course-card">
 
-      <h3 class="course-title">{{ c.course }}</h3>
+  <div class="course-row">
 
-      <div class="progress-container">
-        <div class="progress-bar" style="width: {{ c.progress }}%"></div>
-      </div>
+    <!-- LEFT SIDE -->
+    <div class="course-left">
+      <h3 class="course-title">{{ c.course }}</h3>
 
       <p class="progress-text">
         {{ c.completed }}/{{ c.total_lessons }} lessons completed
       </p>
 
-      <div class="course-actions">
-        <a href="/courses/{{ c.course_id }}/lessons/" class="btn">
-          View Lessons
-        </a>
-        <a href="/api/student/course/{{ c.course_id }}/resume/" class="btn btn-secondary">
-          Resume
-        </a>
+      <div class="progress-container">
+        <div class="progress-bar" style="width: {{ c.progress }}%"></div>
       </div>
+    </div>
 
+    <!-- RIGHT SIDE -->
+    <div class="course-right">
+      <a href="/courses/{{ c.course_id }}/lessons/" class="btn">View Lessons</a>
+      <a href="/api/student/course/{{ c.course_id }}/resume/" class="btn-secondary">Resume</a>
+    </div>
+
+  </div>
+
+</div>
       <a href="{% url 'notifications' %}" class="notification-link">
         🔔 Notifications
       </a>
 
     </div>
     {% endfor %}
-
   </div>
+
 </div>
