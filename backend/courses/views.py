@@ -188,6 +188,9 @@ def student_dashboard(request):
         ).count()
 
         percent = int((completed / total) * 100) if total else 0
+        print("PROGRESS:", percent)
+
+        
 
         data.append({
             "course_id": e.course.id,
@@ -412,6 +415,7 @@ def student_dashboard_page(request):
         total = lessons.count()
         completed = len(completed_ids)
         percent = int((completed / total) * 100) if total else 0
+        print("PROGRESS:", percent)
 
         resume = None
         for l in lessons:

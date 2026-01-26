@@ -15,7 +15,18 @@
   --text-muted: #6B7280;
 
   --success: #22C55E;
+  --success-dark: #178740;
+
   --danger: #EF4444;
+}
+/* ===== GLASS BASE ===== */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  border-radius: 18px;
 }
 
 /* ==============================
@@ -42,7 +53,14 @@ a {
    LAYOUT
 ================================ */
 
-
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
 
 /* ==============================
    HEADINGS
@@ -53,14 +71,34 @@ h1, h2, h3 {
   margin-bottom: 16px;
 }
 
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
 /* ==============================
-   GENERIC CARDS
+   CARDS
 ================================ */
 
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
 
 /* ==============================
-   GENERIC BUTTONS
+   BUTTONS
 ================================ */
 
 button {
@@ -72,15 +110,74 @@ button {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 button:hover {
   background: var(--primary);
+  transform: translateY(-1px);
 }
 
+button:disabled {
+  background: #CBD5E1;
+  cursor: not-allowed;
+}
+
+/* Secondary button */
 button.back {
   background: #E5E7EB;
   color: var(--text-dark);
+}
+
+button.back:hover {
+  background: #D1D5DB;
+}
+
+/* ==============================
+   DASHBOARD PROGRESS
+================================ */
+
+.progress {
+  width: 100%;
+  height: 10px;
+  background: #E5E7EB;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), #16A34A);
+  width: var(--progress) * 0%;
+  transition: width 0.4s ease;
+  max-width: 100%;
+}
+
+/* ==============================
+   COURSE STATUS
+================================ */
+
+.lesson-completed-dark {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.blue-completed {
+  background: var(--navy) !important;
+  color: #fff !important;
+}
+
+/* Certificate button */
+.certificate-btn {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-top: 8px;
 }
 
 /* ==============================
@@ -95,12 +192,14 @@ form {
 
 label {
   font-weight: 600;
+  font-size: 14px;
 }
 
 input {
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--border);
+  font-size: 14px;
 }
 
 input:focus {
@@ -115,7 +214,32 @@ input:focus {
 video {
   width: 100%;
   border-radius: 12px;
+  margin-bottom: 20px;
   background: #000;
+}
+
+/* ==============================
+   NOTIFICATIONS
+================================ */
+
+.notification {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #F8FAFC;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.notification.unread {
+  border-left: 4px solid var(--primary);
+  background: #ECFEFF;
+}
+
+.notification.read {
+  opacity: 0.7;
 }
 
 /* ==============================
@@ -125,6 +249,483 @@ video {
 .alert {
   color: var(--danger);
   font-weight: 600;
+  margin-top: 12px;
+}
+
+/* ==============================
+   FOOTER (OPTIONAL)
+================================ */
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+/* ===== COURSE CARD FIX ===== */
+
+.course-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Course title */
+.course-card h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #142c52; /* navy */
+  font-weight: 600;
+}
+
+/* Progress text */
+.course-progress-text {
+  margin-top: 6px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Progress bar container */
+.course-progress {
+  width: 100%;
+  height: 14px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Progress fill */
+.course-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  width: 100%;
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+/* ===== DASHBOARD GRID (CONTROL WIDTH) ===== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  max-width: 1100px;   /* controls overall width */
+  margin: 0 auto;     /* center dashboard */
+  padding: 20px;
+}
+.course-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.course-progress-text {
+  font-size: 13px;
+  color: #555;
+  margin: 6px 0 8px;
+}
+
+/* Progress bar container */
+.course-progress {
+  width: 100%;
+  height: 10px;              /* NOT thick, NOT thin */
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Progress fill */
+.course-progress-fill {
+  height: 100%;
+  background: #22c55e;
+  border-radius: 6px;
+}
+.course-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.course-actions button {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+/* ===== PAGE ===== */
+body {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: #f4f7fa;
+  margin: 0;
+  padding: 0;
+}
+
+.page-title {
+  text-align: center;
+  margin: 30px 0 10px;
+  color: #142c52;
+}
+
+/* ===== DASHBOARD GRID ===== */
+.dashboard-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* ===== COURSE CARD ===== */
+.course-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+}
+
+.course-title {
+  margin: 0 0 12px;
+  color: #142c52;
+}
+
+/* ===== PROGRESS ===== */
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: calc(var(--progress) * 1%);
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+/* ===== BUTTONS ===== */
+.course-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.btn {
+  background: #1b9aaa;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn:hover {
+  background: #16808d;
+}
+
+.btn-secondary {
+  background: #142c52;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.btn-secondary:hover {
+  background: #0f223f;
+}
+
+/* ===== NOTIFICATION LINK ===== */
+.notification-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #1b9aaa;
+  text-decoration: none;
+}
+
+.notification-link:hover {
+  text-decoration: underline;
+}
+/* ==============================
+   CIVORA NEXUS DESIGN SYSTEM
+================================ */
+
+:root {
+  --primary: #1B9AAA;
+  --primary-dark: #16808D;
+  --navy: #142C52;
+
+  --bg: #F4F7FA;
+  --surface: #FFFFFF;
+  --border: #E5E7EB;
+
+  --text-dark: #071426;
+  --text-muted: #6B7280;
+
+  --success: #22C55E;
+  --success-dark: #178740;
+
+  --danger: #EF4444;
+}
+
+/* ==============================
+   GLOBAL
+================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+}
+
+a {
+  text-decoration: none;
+  color: var(--primary);
+}
+
+/* ==============================
+   PAGE TITLES
+================================ */
+
+.page-title {
+  text-align: center;
+  margin: 30px 0 10px;
+  color: var(--navy);
+}
+
+/* ==============================
+   CONTAINER
+================================ */
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ==============================
+   DASHBOARD GRID
+================================ */
+
+.dashboard-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* ==============================
+   COURSE CARD
+================================ */
+
+.course-card {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+}
+
+.course-title {
+  margin: 0 0 12px;
+  color: var(--navy);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ==============================
+   PROGRESS BAR
+================================ */
+
+.progress-container {
+  width: 100%;
+  height: 10px;              /* balanced size */
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: calc(var(--progress) * 1%);
+  background: linear-gradient(90deg, var(--success), #16a34a);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* ==============================
+   BUTTONS
+================================ */
+
+.course-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.btn {
+  background: var(--primary);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn:hover {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  background: var(--navy);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.btn-secondary:hover {
+  background: #0f223f;
+}
+
+/* ==============================
+   STATUS / COMPLETED
+================================ */
+
+.lesson-completed-dark {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.blue-completed {
+  background: var(--navy) !important;
+  color: #fff !important;
+}
+
+/* ==============================
+   NOTIFICATIONS
+================================ */
+
+.notification {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #F8FAFC;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.notification.unread {
+  border-left: 4px solid var(--primary);
+  background: #ECFEFF;
+}
+
+.notification.read {
+  opacity: 0.7;
+}
+
+.notification-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--primary);
+}
+
+.notification-link:hover {
+  text-decoration: underline;
+}
+
+/* ==============================
+   VIDEO
+================================ */
+
+video {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  background: #000;
+}
+
+/* ==============================
+   FORMS
+================================ */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ==============================
+   ALERTS
+================================ */
+
+.alert {
+  color: var(--danger);
+  font-weight: 600;
+  margin-top: 12px;
 }
 
 /* ==============================
@@ -137,53 +738,321 @@ video {
   font-size: 13px;
   color: var(--text-muted);
 }
-/* ===== COURSE HEADER LAYOUT ===== */
-
-/* ===== COURSE ROW (MAIN FIX) ===== */
-.course-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* ==============================
+   CIVORA NEXUS ADVANCED TOKENS
+================================ */
+:root {
+  --glow-teal: rgba(27,154,170,0.45);
+  --glow-success: rgba(34,197,94,0.45);
+  --dark-bg: #071426;
+  --dark-surface: #0f223f;
+  --dark-border: #1e3558;
+}
+.course-card,
+.card {
+  position: relative;
 }
 
-/* LEFT CONTENT */
-.course-left {
-  flex: 1;
+.course-card::after,
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 transparent;
+  transition: box-shadow 0.3s ease;
+  pointer-events: none;
 }
 
-/* RIGHT BUTTONS */
-.course-right {
-  display: flex;
-  gap: 12px;
+.course-card:hover::after,
+.card:hover::after {
+  box-shadow: 0 0 24px var(--glow-teal);
+}
+.certificate-btn {
+  position: relative;
+  overflow: hidden;
 }
 
-/* TITLE */
-.course-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--navy);
+.certificate-btn::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 60%);
+  transform: scale(0);
+  transition: transform 0.4s ease;
 }
 
-/* PROGRESS TEXT */
-.progress-text {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin: 4px 0 6px;
+.certificate-btn:hover::after {
+  transform: scale(1);
 }
 
-/* PROGRESS BAR */
+/* ==============================
+   DARK MODE
+================================ */
+body.dark {
+  background: var(--dark-bg);
+  color: #e5e7eb;
+}
+
+body.dark .container,
+body.dark .course-card,
+body.dark .card {
+  background: var(--dark-surface);
+  border-color: var(--dark-border);
+  box-shadow: none;
+}
+
+body.dark h1,
+body.dark h2,
+body.dark h3 {
+  color: #e5e7eb;
+}
+
+body.dark .progress-container {
+  background: #1e3558;
+}
+.hero {
+  animation: fadeUp 0.9s ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ===== FINAL PROGRESS BAR (CLEAR + SAFE) ===== */
+
 .progress-container {
-  width: 220px;        /* neat like login bar */
-  height: 6px;
+  width: 220px;          /* neat, not full width */
+  height: 8px;           /* slightly bigger */
   background: #e5e7eb;
-  border-radius: 4px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 8px 0;
+  position: relative;
+}
+
+.progress-bar {
+  width: min(var(--progress, 0%), 100%);
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), var(--success-dark));
+  border-radius: 6px;
+  position: relative;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 6px rgba(34,197,94,0.45); /* subtle glow */
+}
+
+/* Percentage text */
+.progress-label {
+  position: absolute;
+  right: 6px;
+  top: -18px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+/* ===== PROGRESS LABEL FIX ===== */
+/* ===== PROGRESS TEXT (ALWAYS VISIBLE) ===== */
+
+.progress-percent {
+  font-size: 15px;        /* 👈 BIG */
+  font-weight: 600;
+  color: #142c52;         /* navy */
+  margin-bottom: 6px;
+}
+
+/* ===== PROGRESS BAR ===== */
+
+.progress-container {
+  width: 100%;
+  height: 10px;           /* clean size */
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: var(--progress, 0%);
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+/* ===== BIG & CLEAR PERCENTAGE TEXT ===== */
+.progress-percent {
+  font-size: 100px;        /* BIG */
+  font-weight: 700;
+  color: #16a34a;         /* green */
+  margin-left: 8px;
+}
+/* ===== PROGRESS PERCENTAGE TEXT ===== */
+.progress-percentage {
+  font-size: 18px;          /* BIG */
+  font-weight: 700;
+  color: #142c52;
+  margin-bottom: 6px;
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 6px;
   overflow: hidden;
 }
 
 .progress-bar {
   height: 100%;
   background: linear-gradient(90deg, #22c55e, #16a34a);
-  min-width: 6px;      /* IMPORTANT: visible at 0% */
-  border-radius: 4px;
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+.progress-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.progress-big {
+  font-size: 26px;
+  font-weight: 700;
+  color: #142c52;
+}
+
+.progress-small {
+  font-size: 13px;
+  color: #6b7280;
+}
+.progress-container {
+  width: 100%;
+  height: 800px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  width: var(--progress, 0%);
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.progress-big {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 150px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 1;
+}
+
+.progress-small {
+  font-size: 13px;
+  color: #6b7280;
+}
+.course-card,
+.card,
+.container {
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: #e5e7eb;
+  }
+
+  .course-card,
+  .card,
+  .container {
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: none;
+  }
+
+  h1, h2, h3 {
+    color: #f8fafc;
+  }
+
+  .progress-container {
+    background: #1e293b;
+  }
+
+  .progress-bar {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+  }
+}
+.btn,
+.btn-secondary {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn::after,
+.btn-secondary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.35),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.btn:hover::after,
+.btn-secondary:hover::after {
+  transform: translateX(100%);
+}
+
+.btn:hover,
+.btn-secondary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+video {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+video:hover {
+  transform: scale(1.03);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+video {
+  cursor: pointer;
+}
+.course-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 transparent;
+  transition: box-shadow 0.35s ease;
+  pointer-events: none;
+}
+
+.course-card:hover::after {
+  box-shadow: 0 0 30px rgba(34,197,94,0.35);
 }
