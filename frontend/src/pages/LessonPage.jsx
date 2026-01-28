@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import "./styles.css";
+import "../styles.css";
+
+const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
 export default function LessonPage() {
   const { id } = useParams(); // lesson id
@@ -13,48 +15,57 @@ export default function LessonPage() {
   const [videoDone, setVideoDone] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // ✅ FETCH LESSON WITH JWT TOKEN
-  useEffect(() => {
-    setLoading(true);
+  const token = localStorage.getItem("access");
 
-    fetch(`http://127.0.0.1:8000/api/student/lesson/${id}/`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+  // ✅ FETCH LESSON
+  useEffect(() => {
+    const fetchLesson = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${API}/student/lesson/${id}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Unauthorized");
+
+        const data = await res.json();
         setLesson(data);
         setCompleted(false);
         setVideoDone(false);
         setAnswers({});
         setResult(null);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Lesson fetch error:", err);
         setLesson(null);
+      } finally {
         setLoading(false);
-      });
-  }, [id]);
+      }
+    };
 
-  // Select quiz answer
+    fetchLesson();
+  }, [id, token]);
+
+  // Select quiz answer (safe)
   const choose = (qid, opt) => {
-    setAnswers({ ...answers, [qid]: opt });
+    setAnswers((prev) => ({ ...prev, [qid]: opt }));
   };
 
-  // ✅ MARK LESSON COMPLETED AFTER VIDEO
+  // ✅ VIDEO COMPLETED → unlock quiz
   const handleVideoEnd = async () => {
     try {
-      await fetch(
-        `http://127.0.0.1:8000/api/student/lesson/${lesson.id}/complete/`,
+      const res = await fetch(
+        `${API}/student/lesson/${lesson.id}/complete/`,
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
+
+      if (!res.ok) throw new Error("Failed");
 
       setVideoDone(true);
       setCompleted(true);
@@ -69,31 +80,29 @@ export default function LessonPage() {
 
   return (
     <div className="container">
-      {/* Back button */}
+      {/* ⬅ Back */}
       <button className="back" onClick={() => navigate(-1)}>
         ⬅ Back
       </button>
 
-      {/* Lesson Title */}
+      {/* Title */}
       <h2>{lesson.title}</h2>
 
-      {/* ✅ CLOUDINARY VIDEO (FIXED) */}
+      {/* 🎥 Video */}
       {lesson.video_url && (
         <video width="100%" controls onEnded={handleVideoEnd}>
           <source src={lesson.video_url} type="video/mp4" />
         </video>
       )}
 
-      {/* Video Completed */}
       {videoDone && <p className="alert">✅ Video Completed</p>}
 
-      {/* Lesson Content */}
+      {/* Content */}
       <p>{lesson.content}</p>
 
-      {/* Quiz Header */}
+      {/* Quiz */}
       <h3>Quiz {completed ? "✅" : "🔒"}</h3>
 
-      {/* Quiz Section */}
       {completed ? (
         lesson.questions?.length > 0 ? (
           lesson.questions.map((q) => (
@@ -114,23 +123,23 @@ export default function LessonPage() {
             </div>
           ))
         ) : (
-          <p>Start Quiz</p>
+          <p>No quiz questions</p>
         )
       ) : (
         <p className="alert">🔒 Watch the video to unlock the quiz.</p>
       )}
 
-      {/* Start Quiz */}
+      {/* Start Quiz Button */}
       {lesson.quiz_id && (
         <button
-          onClick={() => navigate(`/quiz/${lesson.quiz_id}`)}
           disabled={!completed}
+          onClick={() => navigate(`/quiz/${lesson.quiz_id}`)}
         >
           {completed ? "Start Quiz" : "Watch video to unlock quiz"}
         </button>
       )}
 
-      {/* Result */}
+      {/* Result (future-safe) */}
       {result && (
         <div className="card">
           <h3>Result</h3>

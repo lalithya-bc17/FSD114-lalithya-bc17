@@ -1,46 +1,55 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getDashboard, resumeCourse } from "./api";
-import "./styles.css";
+import { getDashboard, resumeCourse } from "../api";
+import "../styles.css";
+
+/* 🔗 API base URL (works locally + Render) */
+const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
 export default function Dashboard() {
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
+
+  /* ==========================
+     🎓 DOWNLOAD CERTIFICATE
+  ========================== */
   const downloadCertificate = async (courseId, courseTitle) => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("access");
 
-    const response = await fetch(
-      `http://127.0.0.1:8000/api/certificate/${courseId}/`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await fetch(
+        `${API}/certificate/${courseId}/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        alert("Unable to download certificate.");
+        return;
       }
-    );
 
-    if (!response.ok) {
-      alert("Unable to download certificate.");
-      return;
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${courseTitle}_certificate.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error(err);
+      alert("Certificate download failed.");
     }
+  };
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${courseTitle}_certificate.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  } catch (err) {
-    console.error(err);
-    alert("Certificate download failed.");
-  }
-};
-
-
+  /* ==========================
+     📊 LOAD DASHBOARD
+  ========================== */
   useEffect(() => {
     const load = async () => {
       try {
@@ -49,13 +58,22 @@ export default function Dashboard() {
       } catch (e) {
         console.error("Dashboard load failed", e);
         alert("Session expired. Please login again.");
-        localStorage.removeItem("token");
-        navigate("/");
+
+        // ✅ clean logout
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        localStorage.removeItem("role");
+
+        navigate("/login");
       }
     };
+
     load();
   }, [navigate]);
 
+  /* ==========================
+     ▶ VIEW / RESUME
+  ========================== */
   const handleView = (course) => {
     if (course.completed === course.total) {
       alert("🎉 You have completed all lessons in this course!");
@@ -78,6 +96,9 @@ export default function Dashboard() {
     }
   };
 
+  /* ==========================
+     🎨 UI
+  ========================== */
   return (
     <div className="dashboard">
       <h2>My Learning</h2>
@@ -100,34 +121,38 @@ export default function Dashboard() {
               {course.completed}/{course.total} lessons completed
             </p>
 
-            {/* MAIN BUTTON */}
             {!isCompleted ? (
-              <button onClick={() => handleView(course)} className="lesson-open">
+              <button
+                onClick={() => handleView(course)}
+                className="lesson-open"
+              >
                 View Lessons
               </button>
             ) : (
               <button
-              className="lesson-completed blue-completed"
-              onClick={() => alert("🎉 You have completed all lessons in this course!")}
+                className="lesson-completed blue-completed"
+                onClick={() =>
+                  alert("🎉 You have completed all lessons in this course!")
+                }
               >
-               Completed
+                Completed
               </button>
             )}
 
-            {/* RESUME BUTTON (ONLY IF NOT COMPLETED) */}
             {!isCompleted && (
               <button onClick={() => handleResume(course)}>
                 Resume
               </button>
             )}
 
-            {/* 🎓 CERTIFICATE BUTTON (ONLY IF COMPLETED) */}
             {isCompleted && (
               <button
-              className="certificate-btn"
-              onClick={() => downloadCertificate(course.course_id, course.course)}
+                className="certificate-btn"
+                onClick={() =>
+                  downloadCertificate(course.course_id, course.course)
+                }
               >
-              🎓 Download Certificate
+                🎓 Download Certificate
               </button>
             )}
           </div>

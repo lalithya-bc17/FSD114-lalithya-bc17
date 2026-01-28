@@ -4,6 +4,11 @@ const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
    AUTH
 ====================== */
 
+// ✅ DEFINE authHeader FIRST
+export const authHeader = () => ({
+  Authorization: "Bearer " + localStorage.getItem("access"),
+});
+
 export async function login(username, password) {
   const res = await fetch(`${API}/token/`, {
     method: "POST",
@@ -14,14 +19,15 @@ export async function login(username, password) {
   const data = await res.json();
   if (!res.ok) throw data;
 
-  // store ACCESS token
+  // ✅ Store JWT + role
   localStorage.setItem("access", data.access);
+  if (data.refresh) {
+    localStorage.setItem("refresh", data.refresh);
+  }
+  localStorage.setItem("role", data.role);
+
   return data;
 }
-
-export const authHeader = () => ({
-  Authorization: "Bearer " + localStorage.getItem("access"),
-});
 
 /* ======================
    DASHBOARD
@@ -38,7 +44,9 @@ export const getDashboard = async () => {
 export const resumeCourse = async (courseId) => {
   const res = await fetch(
     `${API}/student/course/${courseId}/resume/`,
-    { headers: authHeader() }
+    {
+      headers: authHeader(),
+    }
   );
   return res.json();
 };

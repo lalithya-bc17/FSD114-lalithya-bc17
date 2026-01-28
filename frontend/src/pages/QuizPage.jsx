@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getQuiz, submitQuiz } from "./api";
+import { getQuiz, submitQuiz } from "../api";
+import "../styles.css";
 
 export default function QuizPage() {
   const { id } = useParams(); // quiz id
@@ -10,17 +11,19 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
 
-  // Load quiz
+  // ✅ Load quiz
   useEffect(() => {
     getQuiz(id)
       .then((data) => setQuiz(data))
       .catch(() => alert("Failed to load quiz"));
   }, [id]);
 
+  // Select answer
   const selectAnswer = (questionId, optionKey) => {
-    setAnswers({ ...answers, [questionId]: optionKey });
+    setAnswers((prev) => ({ ...prev, [questionId]: optionKey }));
   };
 
+  // Submit quiz
   const handleSubmit = async () => {
     if (Object.keys(answers).length === 0) {
       alert("❌ Please select at least one answer before submitting");
@@ -43,9 +46,16 @@ export default function QuizPage() {
 
   if (!quiz) return <p>Loading quiz...</p>;
 
-  // Lock quiz if already passed
+  // ✅ If quiz already passed
   if (quiz.locked) {
-    return <h2>✅ Quiz already passed</h2>;
+    return (
+      <div className="container">
+        <h2>✅ Quiz already passed</h2>
+        <button onClick={() => navigate("/student/dashboard")}>
+          ⬅ Back to Dashboard
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -53,11 +63,7 @@ export default function QuizPage() {
       <h2>{quiz.title}</h2>
 
       {quiz.questions.map((q) => (
-        <div
-          key={q.id}
-          className="card"
-          style={{ padding: "10px", margin: "10px 0" }}
-        >
+        <div key={q.id} className="card">
           <h4>{q.text}</h4>
 
           {["a", "b", "c", "d"].map((key) => {
@@ -100,7 +106,7 @@ export default function QuizPage() {
       ))}
 
       {!result && (
-        <button onClick={handleSubmit} style={{ marginTop: "20px" }}>
+        <button onClick={handleSubmit} style={{ marginTop: 20 }}>
           Submit Quiz
         </button>
       )}
@@ -110,39 +116,23 @@ export default function QuizPage() {
           <h3>Score: {result.score}%</h3>
           <p>{result.passed ? "✅ Passed" : "❌ Failed"}</p>
 
-          {/* ✅ Resume Next Lesson */}
+          {/* ▶ Resume next lesson */}
           {result.passed && result.next_lesson_id && (
             <button
               onClick={() =>
                 navigate(`/lesson/${result.next_lesson_id}`)
               }
-              style={{
-                marginTop: "20px",
-                padding: "10px 20px",
-                backgroundColor: "#4CAF50",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
+              className="lesson-open"
             >
               ▶ Resume Next Lesson
             </button>
           )}
 
-          {/* 🎓 Certificate / Dashboard Redirect */}
+          {/* 🎓 Course completed */}
           {result.passed && !result.next_lesson_id && (
             <button
-              onClick={() => navigate("/dashboard")}
-              style={{
-                marginTop: "20px",
-                padding: "10px 20px",
-                backgroundColor: "#2196F3",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
+              onClick={() => navigate("/student/dashboard")}
+              className="certificate-btn"
             >
               🎓 Go to Dashboard / Download Certificate
             </button>

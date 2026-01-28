@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getCourseLessons } from "./api";
-import "./styles.css";
+import { getCourseLessons } from "../api";
+import "../styles.css";
 
 export default function CoursePage() {
   const { id } = useParams();
@@ -15,8 +15,7 @@ export default function CoursePage() {
       setLoading(true);
       try {
         const data = await getCourseLessons(id);
-        setLessons(data.courses || []);
-        // Backend may return array or { lessons: [] }
+        setLessons(data.lessons || data || []);
       } catch (err) {
         console.error("Lesson fetch error:", err);
         setLessons([]);
@@ -32,7 +31,6 @@ export default function CoursePage() {
   if (!lessons || lessons.length === 0)
     return <p>No lessons found for this course.</p>;
 
-  // 🎉 If all lessons are completed
   const allCompleted = lessons.every(l => l.status === "completed");
 
   if (allCompleted) {
@@ -40,7 +38,7 @@ export default function CoursePage() {
       <div className="container">
         <h2>🎉 Course Completed</h2>
         <p>No lessons left to complete.</p>
-        <button onClick={() => navigate("/dashboard")}>
+        <button onClick={() => navigate("/student/dashboard")}>
           ⬅ Back to Dashboard
         </button>
       </div>

@@ -1,35 +1,90 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./Login";
-import Dashboard from "./Dashboard";
-import CoursePage from "./CoursePage";
-import LessonPage from "./LessonPage";
-import QuizPage from "./QuizPage";
 
-function PrivateRoute({ children }) {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/" />;
+// 🌍 Public pages
+import Home from "./pages/Home";
+import Courses from "./pages/Courses";
+import VerifyCertificate from "./pages/VerifyCertificate";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+
+// 🎓 Dashboards
+import StudentDashboard from "./pages/StudentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+
+// 📚 Learning pages
+
+import CoursePage from "./pages/CoursePage";
+import LessonPage from "./pages/LessonPage";
+import QuizPage from "./pages/QuizPage";
+
+/* =========================
+   🔐 ROLE-BASED ROUTE
+========================= */
+function PrivateRoute({ children, role }) {
+  const token = localStorage.getItem("access");
+  const userRole = localStorage.getItem("role");
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  if (role && userRole !== role) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 }
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/quiz/:id" element={<QuizPage />} />
 
+        {/* 🌍 PUBLIC */}
+        <Route path="/" element={<Home />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/verify" element={<VerifyCertificate />} />
+
+        {/* 🔐 AUTH */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* 🎓 STUDENT */}
         <Route
-          path="/dashboard"
+          path="/student/dashboard"
           element={
-            <PrivateRoute>
-              <Dashboard />
+            <PrivateRoute role="student">
+              <StudentDashboard />
             </PrivateRoute>
           }
         />
 
+        {/* 👩‍🏫 TEACHER */}
+        <Route
+          path="/teacher/dashboard"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherDashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* 🛠 ADMIN */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <PrivateRoute role="admin">
+              <AdminDashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* 📚 LEARNING FLOW (STUDENT ONLY) */}
         <Route
           path="/course/:id"
           element={
-            <PrivateRoute>
+            <PrivateRoute role="student">
               <CoursePage />
             </PrivateRoute>
           }
@@ -38,12 +93,21 @@ export default function App() {
         <Route
           path="/lesson/:id"
           element={
-            <PrivateRoute>
+            <PrivateRoute role="student">
               <LessonPage />
             </PrivateRoute>
           }
-        
         />
+
+        <Route
+          path="/quiz/:id"
+          element={
+            <PrivateRoute role="student">
+              <QuizPage />
+            </PrivateRoute>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );
