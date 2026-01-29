@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api";
 import "../styles.css";
+
 export default function Login() {
   const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,14 +19,17 @@ export default function Login() {
 
       // ✅ JWT received
       if (data.access) {
-        // ✅ Store tokens correctly
+        // ✅ Store tokens
         localStorage.setItem("access", data.access);
+
         if (data.refresh) {
           localStorage.setItem("refresh", data.refresh);
         }
 
         // ✅ Store role (student / teacher / admin)
-        localStorage.setItem("role", data.role);
+        if (data.role) {
+          localStorage.setItem("role", data.role);
+        }
 
         // ✅ Role-based redirect
         if (data.role === "student") {
@@ -34,7 +39,6 @@ export default function Login() {
         } else if (data.role === "admin") {
           navigate("/admin/dashboard");
         } else {
-          // fallback
           navigate("/");
         }
       } else {

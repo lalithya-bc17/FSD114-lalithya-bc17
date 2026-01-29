@@ -12,7 +12,7 @@ export default function Signup() {
 
     try {
       const res = await fetch(
-        "http://127.0.0.1:8000/api/signup/student/",
+        "https://certificate-verification-backend-7gpb.onrender.com/api/signup/student/",
         {
           method: "POST",
           headers: {
@@ -33,13 +33,9 @@ export default function Signup() {
         return;
       }
 
-      // ✅ Save JWT properly
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
-      localStorage.setItem("role", data.role); // "student"
-
-      // ✅ Redirect to student dashboard
-      navigate("/student/dashboard");
+      // ✅ Signup success → go to login
+      alert("Signup successful. Please login.");
+      navigate("/login");
 
     } catch (err) {
       console.error(err);

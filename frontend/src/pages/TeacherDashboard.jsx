@@ -1,3 +1,61 @@
-export default function Page() {
-  return <h1>Coming soon</h1>;
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles.css";
+
+export default function TeacherDashboard() {
+  const navigate = useNavigate();
+  const username = localStorage.getItem("name");
+
+  return (
+    <div className="dashboard-container">
+      <h2>Welcome, Teacher 👋</h2>
+      <p className="subtitle">
+        Manage your courses, lessons, and assessments
+      </p>
+
+      {/* STATS */}
+      <div className="card-grid">
+        <div className="card">
+          <h3>My Courses</h3>
+          <p>View & manage courses</p>
+          <button onClick={() => navigate("/teacher/courses")}>
+            View Courses
+          </button>
+        </div>
+
+        <div className="card">
+          <h3>Add Lesson</h3>
+          <p>Create lessons for courses</p>
+          <button onClick={() => navigate("/teacher/add-lesson")}>
+            Add Lesson
+          </button>
+        </div>
+
+        <div className="card">
+          <h3>Quizzes</h3>
+          <p>Create & review quizzes</p>
+          <button onClick={() => navigate("/teacher/quizzes")}>
+            Manage Quizzes
+          </button>
+        </div>
+
+        <div className="card">
+          <h3>Students</h3>
+          <p>View enrolled students</p>
+          <button disabled>Coming Soon</button>
+        </div>
+      </div>
+
+      {/* INFO */}
+      <div className="info-box">
+        <p>
+          ⚠️ Course creation and grading are currently managed via the Admin
+          Panel.
+        </p>
+        <p>
+          This dashboard provides a simplified teaching interface.
+        </p>
+      </div>
+    </div>
+  );
 }
