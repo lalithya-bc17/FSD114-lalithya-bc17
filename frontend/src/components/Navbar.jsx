@@ -40,7 +40,7 @@ export default function Navbar() {
         {token && (
           <>
             <span className="nav-user">
-              👋 Hello, <b>{name}</b>
+              👋 Hello, {name}
             </span>
             <Link to="/student/dashboard">Dashboard</Link>
             <button className="logout-btn" onClick={handleLogout}>

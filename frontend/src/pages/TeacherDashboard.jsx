@@ -4,11 +4,11 @@ import "../styles.css";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
-  const username = localStorage.getItem("name");
+  const name = localStorage.getItem("name");
 
   return (
     <div className="dashboard-container">
-      <h2>Welcome, Teacher 👋</h2>
+      <h2>Welcome, {name} 👋</h2>
       <p className="subtitle">
         Manage your courses, lessons, and assessments
       </p>
@@ -42,7 +42,9 @@ export default function TeacherDashboard() {
         <div className="card">
           <h3>Students</h3>
           <p>View enrolled students</p>
-          <button disabled>Coming Soon</button>
+          <button onClick={() => navigate("/teacher/students")}>
+            View Students
+          </button>
         </div>
       </div>
 

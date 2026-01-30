@@ -1,4 +1,4 @@
-const API = "http://localhost:8000/api";
+const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
 /* ======================
    AUTH

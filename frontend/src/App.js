@@ -17,6 +17,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CoursePage from "./pages/CoursePage";
 import LessonPage from "./pages/LessonPage";
 import QuizPage from "./pages/QuizPage";
+import TeacherCourses from "./pages/TeacherCourses";
+import AddLesson from "./pages/AddLesson";
+import TeacherQuizzes from "./pages/TeacherQuizzes";
+import TeacherStudents from "./pages/TeacherStudents";
 
 /* =========================
    🔐 ROLE-BASED ROUTE
@@ -61,14 +65,50 @@ export default function App() {
         />
 
         {/* 👩‍🏫 TEACHER */}
-        <Route
-          path="/teacher/dashboard"
-          element={
-            <PrivateRoute role="teacher">
-              <TeacherDashboard />
-            </PrivateRoute>
-          }
-        />
+        {/* 👩‍🏫 TEACHER */}
+<Route
+  path="/teacher/dashboard"
+  element={
+    <PrivateRoute role="teacher">
+      <TeacherDashboard />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/teacher/courses"
+  element={
+    <PrivateRoute role="teacher">
+      <TeacherCourses />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/teacher/add-lesson"
+  element={
+    <PrivateRoute role="teacher">
+      <AddLesson />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/teacher/quizzes"
+  element={
+    <PrivateRoute role="teacher">
+      <TeacherQuizzes />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/teacher/students"
+  element={
+    <PrivateRoute role="teacher">
+      <TeacherStudents />
+    </PrivateRoute>
+  }
+/>
 
         {/* 🛠 ADMIN */}
         <Route

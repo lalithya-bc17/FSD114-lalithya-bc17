@@ -30,6 +30,11 @@ export default function Login() {
         if (data.role) {
           localStorage.setItem("role", data.role);
         }
+        if (data.name) {
+          localStorage.setItem("name", data.name);
+        } else {
+          localStorage.setItem("name", username);
+        }
 
         // ✅ Role-based redirect
         if (data.role === "student") {
@@ -74,7 +79,6 @@ export default function Login() {
         </div>
 
         <button type="submit">Login</button>
-
         {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>

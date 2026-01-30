@@ -4,7 +4,7 @@ import { getCourseLessons } from "../api";
 import "../styles.css";
 
 export default function CoursePage() {
-  const { id } = useParams();
+  const { id: courseId } = useParams();
   const navigate = useNavigate();
 
   const [lessons, setLessons] = useState([]);
@@ -14,7 +14,7 @@ export default function CoursePage() {
     const fetchLessons = async () => {
       setLoading(true);
       try {
-        const data = await getCourseLessons(id);
+        const data = await getCourseLessons(courseId);
         setLessons(data.courses || []);
       } catch (err) {
         console.error("Lesson fetch error:", err);
@@ -25,13 +25,14 @@ export default function CoursePage() {
     };
 
     fetchLessons();
-  }, [id]);
+  }, [courseId]);
 
   if (loading) return <p>Loading lessons...</p>;
-  if (!lessons || lessons.length === 0)
-    return <p>No lessons found for this course.</p>;
+  if (!lessons.length) return <p>No lessons found for this course.</p>;
 
-  const allCompleted = lessons.every(l => l.status === "completed");
+  const allCompleted =
+    lessons.length > 0 &&
+    lessons.every(l => l.status === "completed");
 
   if (allCompleted) {
     return (
@@ -65,6 +66,8 @@ export default function CoursePage() {
             alert("Please complete the previous lesson first!");
             return;
           }
+
+          // ✅ FIXED ROUTE
           navigate(`/lesson/${lesson.id}`);
         };
 
@@ -77,7 +80,6 @@ export default function CoursePage() {
 
             <button
               onClick={handleClick}
-              disabled={lesson.status === "completed"}
               className={
                 lesson.status === "completed"
                   ? "lesson-completed"
@@ -87,7 +89,7 @@ export default function CoursePage() {
               }
             >
               {lesson.status === "completed"
-                ? "Completed"
+                ? "Open Again"
                 : canOpen
                 ? "Open"
                 : "Locked 🔒"}
