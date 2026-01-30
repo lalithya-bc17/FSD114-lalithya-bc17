@@ -15,7 +15,7 @@ export default function CoursePage() {
       setLoading(true);
       try {
         const data = await getCourseLessons(id);
-        setLessons(data.lessons || data || []);
+        setLessons(data.courses || []);
       } catch (err) {
         console.error("Lesson fetch error:", err);
         setLessons([]);
