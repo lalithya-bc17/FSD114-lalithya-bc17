@@ -54,10 +54,26 @@ export default function LessonPage() {
 
   // ✅ VIDEO COMPLETED → unlock quiz
   // ✅ CORRECT — frontend-only unlock
-   const handleVideoEnd = () => {
-     setVideoDone(true);
-     setCompleted(true);
-    };
+   const handleVideoEnd = async () => {
+  try {
+    const res = await fetch(
+      `${API}/student/lesson/${lesson.id}/complete/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!res.ok) throw new Error("Failed");
+
+    setVideoDone(true);
+    setCompleted(true);
+  } catch (err) {
+    console.error(err);
+    alert("Could not mark lesson completed");
+  }
+};
 
   if (loading) return <p>Loading lesson...</p>;
   if (!lesson) return <p>Lesson not found</p>;
