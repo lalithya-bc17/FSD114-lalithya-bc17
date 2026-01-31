@@ -74,30 +74,34 @@ def enroll(request):
 
 def is_lesson_unlocked(student, lesson):
     """
-    Check if a lesson is unlocked for the student.
     First lesson is always unlocked.
-    Subsequent lessons require all previous lessons and their quizzes to be completed/passed.
+    Other lessons require all previous lessons AND their quizzes (if any)
+    to be completed.
     """
-    # First lesson always unlocked
+
     if lesson.order == 1:
         return True
 
-    # All previous lessons
-    previous = Lesson.objects.filter(course=lesson.course, order__lt=lesson.order).order_by("order")
+    previous_lessons = Lesson.objects.filter(
+        course=lesson.course,
+        order__lt=lesson.order
+    ).order_by("order")
 
-    for prev in previous:
-        # Check if lesson is completed
-        lesson_done = Progress.objects.filter(student=student, lesson=prev, completed=True).exists()
+    for prev in previous_lessons:
+        # Lesson must be completed
+        lesson_done = Progress.objects.filter(
+            student=student,
+            lesson=prev,
+            completed=True
+        ).exists()
 
-        # Check if quiz is passed (if quiz exists)
-        quiz_done = True  # default True if no quiz
-        if hasattr(prev, "quiz") and prev.quiz:
-            quiz_done = Quiz.objects.filter(
-                id=prev.quiz.id,
-                id__in=student.completed_quizzes.values_list("id", flat=True)
-            ).exists()
+        # Quiz check (SAFE)
+        try:
+            quiz = prev.quiz
+            quiz_done = student.completed_quizzes.filter(id=quiz.id).exists()
+        except Quiz.DoesNotExist:
+            quiz_done = True  # no quiz → OK
 
-        # If either lesson or quiz not done → locked
         if not (lesson_done and quiz_done):
             return False
 
@@ -110,10 +114,23 @@ def lesson_detail(request, lesson_id):
     student = request.user.student
     lesson = get_object_or_404(Lesson, id=lesson_id)
 
-    if not is_lesson_unlocked(student, lesson):
-        return Response({"detail": "Locked"}, status=403)
+    already_done = Progress.objects.filter(
+        student=student,
+        lesson=lesson,
+        completed=True
+    ).exists()
 
-    return Response(LessonSerializer(lesson).data)
+    if not already_done and not is_lesson_unlocked(student, lesson):
+        return Response({"detail": "Lesson locked"}, status=403)
+
+    return Response({
+        "id": lesson.id,
+        "title": lesson.title,
+        "content": lesson.content,
+        "video_url": lesson.video_url,
+        "quiz_id": lesson.quiz.id if hasattr(lesson, "quiz") and lesson.quiz else None,
+    })
+
 from django.contrib.auth.decorators import login_required
 
 
@@ -129,7 +146,7 @@ def quiz_detail(request, quiz_id):
     return Response({
         "id": quiz.id,
         "title": quiz.title,
-        "locked": False if passed else True,
+        "passed": passed,
         "questions": [
             {
                 "id": q.id,
@@ -328,20 +345,21 @@ def resume_course(request, course_id):
 # -----------------------------
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsStudent])
 def submit_quiz(request, quiz_id):
     student = request.user.student
     quiz = get_object_or_404(Quiz, id=quiz_id)
-    answers = request.data.get("answers", {})
+    lesson = get_object_or_404(Lesson, quiz=quiz)
 
+    answers = request.data.get("answers", {})
     total = quiz.questions.count()
+
     if not answers:
         return Response({"error": "No answers submitted"}, status=400)
 
     correct = 0
     result = []
 
-    # Evaluate answers
     import re
 
     for q in quiz.questions.all():
@@ -350,16 +368,15 @@ def submit_quiz(request, quiz_id):
         is_correct = selected == correct_option
 
         if is_correct:
-           correct += 1
+            correct += 1
 
         result.append({
-           "question_id": q.id,
-           "selected": selected,
-           "correct": correct_option,
-           "is_correct": is_correct
+            "question_id": q.id,
+            "selected": selected,
+            "correct": correct_option,
+            "is_correct": is_correct
         })
 
-        # Save StudentAnswer
         StudentAnswer.objects.update_or_create(
             student=student,
             question=q,
@@ -373,23 +390,22 @@ def submit_quiz(request, quiz_id):
     all_lessons_completed = False
 
     if passed:
-        # Mark current lesson as completed
-        lesson = get_object_or_404(Lesson, quiz=quiz)
+        # mark lesson completed
         Progress.objects.update_or_create(
             student=student,
             lesson=lesson,
             defaults={"completed": True}
         )
-        # Add quiz to completed quizzes
+
+        # mark quiz completed ✅
         student.completed_quizzes.add(quiz)
-        
-        # Try to find next lesson by order
+
+        # find next lesson
         next_lesson = Lesson.objects.filter(
             course=lesson.course,
             order__gt=lesson.order
         ).order_by("order").first()
 
-        # Fallback: if order is duplicate, pick by id
         if not next_lesson:
             next_lesson = Lesson.objects.filter(
                 course=lesson.course,
@@ -399,7 +415,8 @@ def submit_quiz(request, quiz_id):
         if next_lesson:
             next_lesson_id = next_lesson.id
         else:
-            all_lessons_completed 
+            all_lessons_completed = True
+
     return Response({
         "score": score,
         "passed": passed,
@@ -612,6 +629,8 @@ def lesson_detail_page(request, lesson_id):
     return render(request, "courses/lesson_detail.html", {
         "lesson": lesson
     })
+    # allow access if already completed
+
 # LEGACY - DO NOT USE FOR REACT
 def announcements_page(request):
     announcements = Announcement.objects.order_by('-created_at')

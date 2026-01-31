@@ -47,7 +47,7 @@ export default function QuizPage() {
   if (!quiz) return <p>Loading quiz...</p>;
 
   // ✅ If quiz already passed
-  if (quiz.locked) {
+  if (quiz.passed) {
     return (
       <div className="container">
         <h2>✅ Quiz already passed</h2>

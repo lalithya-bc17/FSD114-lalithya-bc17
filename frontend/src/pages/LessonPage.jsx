@@ -123,7 +123,7 @@ export default function LessonPage() {
             </div>
           ))
         ) : (
-          <p>No quiz questions</p>
+          <p>Click Start Quiz</p>
         )
       ) : (
         <p className="alert">🔒 Watch the video to unlock the quiz.</p>
