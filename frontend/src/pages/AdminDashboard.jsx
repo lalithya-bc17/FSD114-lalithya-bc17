@@ -1,14 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../styles.css";
 
 export default function AdminDashboard() {
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    fetch("https://certificate-verification-backend-7gpb.onrender.com/api/admin/stats/", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("access"),
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setStats(data))
+      .catch(() => console.error("Failed to load admin stats"));
+  }, []);
+
   return (
     <div className="dashboard-container">
       <h2>Welcome, Admin 🛠️</h2>
-      <p className="subtitle">
-        System overview & administration
-      </p>
+      <p className="subtitle">System overview & administration</p>
 
+      {/* 🔢 ADMIN STATS */}
+      {stats && (
+        <div className="stats-grid">
+          <div className="stat-card">👤 Users: {stats.total_users}</div>
+          <div className="stat-card">🎓 Students: {stats.total_students}</div>
+          <div className="stat-card">📚 Courses: {stats.total_courses}</div>
+          <div className="stat-card">📝 Enrollments: {stats.total_enrollments}</div>
+          <div className="stat-card">📜 Certificates: {stats.total_certificates}</div>
+        </div>
+      )}
+
+      {/* MAIN ACTION CARDS */}
       <div className="card-grid">
         {/* DJANGO ADMIN */}
         <div className="card">

@@ -75,8 +75,10 @@ def enroll(request):
 def is_lesson_unlocked(student, lesson):
     """
     First lesson is always unlocked.
-    Other lessons require all previous lessons AND their quizzes (if any)
-    to be completed.
+    Other lessons unlock ONLY if previous lessons are completed.
+    Progress.completed already means:
+    - video watched
+    - quiz passed
     """
 
     if lesson.order == 1:
@@ -88,21 +90,13 @@ def is_lesson_unlocked(student, lesson):
     ).order_by("order")
 
     for prev in previous_lessons:
-        # Lesson must be completed
-        lesson_done = Progress.objects.filter(
+        completed = Progress.objects.filter(
             student=student,
             lesson=prev,
             completed=True
         ).exists()
 
-        # Quiz check (SAFE)
-        try:
-            quiz = prev.quiz
-            quiz_done = student.completed_quizzes.filter(id=quiz.id).exists()
-        except Quiz.DoesNotExist:
-            quiz_done = True  # no quiz → OK
-
-        if not (lesson_done and quiz_done):
+        if not completed:
             return False
 
     return True
@@ -742,3 +736,21 @@ def teacher_students(request):
         })
 
     return Response(data)
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
+from .models import Course
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def admin_courses(request):
+    courses = Course.objects.all()
+    return Response([
+        {
+            "id": c.id,
+            "title": c.title,
+            "description": c.description,
+        }
+        for c in courses
+    ])
