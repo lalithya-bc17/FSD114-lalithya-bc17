@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .models import Student, Teacher
 from .serializers import StudentSerializer, TeacherSerializer
 from .permissions import IsStudent, IsTeacher
+from rest_framework.permissions import IsAdminUser
 
 from django.contrib.auth.models import User
 from rest_framework import status
