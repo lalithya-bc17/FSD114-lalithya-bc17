@@ -6,6 +6,7 @@ import Courses from "./pages/Courses";
 import VerifyCertificate from "./pages/VerifyCertificate";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Notifications from "./pages/Notifications";
 
 // 🎓 Dashboards
 import StudentDashboard from "./pages/StudentDashboard";
@@ -53,6 +54,7 @@ export default function App() {
         {/* 🔐 AUTH */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/notifications" element={<Notifications />} />
 
         {/* 🎓 STUDENT */}
         <Route

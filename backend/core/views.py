@@ -53,11 +53,11 @@ def student_signup(request):
             password=password
         )
 
-        # ✅ Create student profile
-        student = Student.objects.create(user=user)
+        # ✅ Student is AUTO-created by signal
 
-        # ✅ AUTO-ENROLL INTO DEFAULT COURSE
-        default_course = Course.objects.first()   # Python course
+        # ✅ AUTO-ENROLL
+        student = user.student
+        default_course = Course.objects.first()
         if default_course:
             Enrollment.objects.get_or_create(
                 student=student,
@@ -67,6 +67,12 @@ def student_signup(request):
         return Response(
             {"message": "Student account created & enrolled"},
             status=status.HTTP_201_CREATED
+        )
+
+    except IntegrityError:
+        return Response(
+            {"error": "Username already exists"},
+            status=status.HTTP_400_BAD_REQUEST
         )
 
     except IntegrityError:

@@ -29,6 +29,7 @@ export default function Navbar() {
         <Link to="/">Home</Link>
         <Link to="/courses">Courses</Link>
         <Link to="/verify">Verify</Link>
+        <Link to="/notifications">Notifications</Link>
 
         {!token && <Link to="/login">Login</Link>}
         {!token && (
@@ -36,6 +37,7 @@ export default function Navbar() {
             Sign Up
           </Link>
         )}
+        
 
         {token && (
           <>
