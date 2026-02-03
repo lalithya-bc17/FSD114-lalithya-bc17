@@ -1,27 +1,67 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { enrollCourse } from "../api"; // ✅ this path is correct if api.js is in src/
+
+const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(
-      "https://certificate-verification-backend-7gpb.onrender.com/api/courses/"
-    )
-      .then(res => res.json())
-      .then(data => setCourses(data));
+    fetch(`${API}/courses/`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("access"),
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCourses(data);
+        } else if (Array.isArray(data.results)) {
+          setCourses(data.results);
+        } else {
+          setCourses([]);
+        }
+      })
+      .finally(() => setLoading(false));
   }, []);
 
+  const handleEnroll = async (courseId) => {
+    try {
+      await enrollCourse(courseId);
+      alert("Enrolled successfully!");
+      navigate("/dashboard"); // ✅ redirect after enroll
+    } catch (err) {
+      alert("Already enrolled or error occurred");
+    }
+  };
+
+  if (loading) return <p>Loading courses...</p>;
+
   return (
-    <div>
+    <div style={{ padding: 20 }}>
       <h2>Available Courses</h2>
 
       {courses.length === 0 && <p>No courses available</p>}
 
-      {courses.map(course => (
-        <div key={course.id} style={{ border: "1px solid #ccc", margin: 10, padding: 10 }}>
+      {courses.map((course) => (
+        <div
+          key={course.id}
+          style={{
+            border: "1px solid #ccc",
+            margin: 10,
+            padding: 15,
+            borderRadius: 8,
+          }}
+        >
           <h3>{course.title}</h3>
           <p>{course.description}</p>
-          <button>Enroll</button>
+
+          <button onClick={() => handleEnroll(course.id)}>
+            Enroll
+          </button>
         </div>
       ))}
     </div>
