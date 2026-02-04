@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDashboard, resumeCourse } from "../api";
 import "../styles.css";
+import { toast } from "react-toastify";
 
 /* 🔗 API base URL (works locally + Render) */
 const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
@@ -28,7 +30,7 @@ export default function Dashboard() {
       );
 
       if (!response.ok) {
-        alert("Unable to download certificate.");
+        toast.error("Unable to download certificate.");
         return;
       }
 
@@ -43,7 +45,7 @@ export default function Dashboard() {
       a.remove();
     } catch (err) {
       console.error(err);
-      alert("Certificate download failed.");
+      toast.error("Certificate download failed.");
     }
   };
 
@@ -57,7 +59,7 @@ export default function Dashboard() {
         setCourses(data || []);
       } catch (e) {
         console.error("Dashboard load failed", e);
-        alert("Session expired. Please login again.");
+        toast.error("Session expired. Please login again.");
 
         // ✅ clean logout
         localStorage.removeItem("access");
@@ -76,7 +78,7 @@ export default function Dashboard() {
   ========================== */
   const handleView = (course) => {
     if (course.completed === course.total) {
-      alert("🎉 You have completed all lessons in this course!");
+      toast.success("🎉 You have completed all lessons in this course!");
       return;
     }
     navigate(`/course/${course.course_id}`);
@@ -88,11 +90,11 @@ export default function Dashboard() {
       if (data.lesson_id) {
         navigate(`/lesson/${data.lesson_id}`);
       } else {
-        alert("No lesson to resume.");
+        toast.error("No lesson to resume.");
       }
     } catch (e) {
       console.error("Resume failed", e);
-      alert("Failed to resume course");
+      toast.error("Failed to resume course");
     }
   };
 
@@ -100,64 +102,89 @@ export default function Dashboard() {
      🎨 UI
   ========================== */
   return (
-    <div className="dashboard">
-      <h2>My Learning</h2>
+  <div className="dashboard">
+    <h2>My Learning</h2>
 
-      {courses.map((course) => {
-        const percent = course.progress;
-        const isCompleted = course.completed === course.total;
+    {/* ✅ EMPTY STATE (ADD THIS BLOCK) */}
+    {courses.length === 0 && (
+      <div style={{ marginTop: "40px", textAlign: "center" }}>
+        <h3>No courses enrolled yet 📘</h3>
+        <p>Start learning by enrolling in a course</p>
 
-        return (
-          <div key={course.course_id} className="course-card">
-            <h3>{course.course}</h3>
+        <button
+          onClick={() => navigate("/courses")}
+          style={{
+            marginTop: "16px",
+            padding: "10px 20px",
+            borderRadius: "6px",
+            background: "#0d9488",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Browse Courses
+        </button>
+      </div>
+    )}
 
-            <div className="progress">
-              <div className="progress-bar" style={{ width: percent + "%" }}>
-                {percent}%
-              </div>
+    {/* ✅ EXISTING COURSE CARDS (KEEP AS IS) */}
+    {courses.map((course) => {
+      const percent = course.progress;
+      const isCompleted = course.completed === course.total;
+
+      return (
+        <div key={course.course_id} className="course-card">
+          <h3>{course.course}</h3>
+
+          <div className="progress">
+            <div className="progress-bar" style={{ width: percent + "%" }}>
+              {percent}%
             </div>
-
-            <p>
-              {course.completed}/{course.total} lessons completed
-            </p>
-
-            {!isCompleted ? (
-              <button
-                onClick={() => handleView(course)}
-                className="lesson-open"
-              >
-                View Lessons
-              </button>
-            ) : (
-              <button
-                className="lesson-completed blue-completed"
-                onClick={() =>
-                  alert("🎉 You have completed all lessons in this course!")
-                }
-              >
-                Completed
-              </button>
-            )}
-
-            {!isCompleted && (
-              <button onClick={() => handleResume(course)}>
-                Resume
-              </button>
-            )}
-
-            {isCompleted && (
-              <button
-                className="certificate-btn"
-                onClick={() =>
-                  downloadCertificate(course.course_id, course.course)
-                }
-              >
-                🎓 Download Certificate
-              </button>
-            )}
           </div>
-        );
-      })}
-    </div>
-  );
+
+          <p>
+            {course.completed}/{course.total} lessons completed
+          </p>
+
+          {!isCompleted ? (
+            <button
+              onClick={() => handleView(course)}
+              className="lesson-open"
+            >
+              View Lessons
+            </button>
+          ) : (
+            <button
+              className="lesson-completed blue-completed"
+              onClick={() =>
+                toast.success("🎉 You have completed all lessons in this course!")
+              }
+            >
+              Completed
+            </button>
+          )}
+
+          {!isCompleted && (
+            <button onClick={() => handleResume(course)}>
+              Resume
+            </button>
+          )}
+
+          {isCompleted && (
+            <button
+              className="certificate-btn"
+              onClick={() =>
+                downloadCertificate(course.course_id, course.course)
+              }
+            >
+              🎓 Download Certificate
+            </button>
+          )}
+        </div>
+      );
+    })}
+  </div>
+
+);
 }

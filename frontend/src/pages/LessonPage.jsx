@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles.css";
+import { toast } from "react-toastify";
 
 const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
@@ -71,7 +72,7 @@ export default function LessonPage() {
     setCompleted(true);
   } catch (err) {
     console.error(err);
-    alert("Could not mark lesson completed");
+    toast.error("Could not mark lesson completed");
   }
 };
 

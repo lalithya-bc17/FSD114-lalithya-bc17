@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getQuiz, submitQuiz } from "../api";
 import "../styles.css";
+import { toast } from "react-toastify";
 
 export default function QuizPage() {
   const { id } = useParams(); // quiz id
@@ -11,11 +12,20 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
 
+  // ✅ ref to control reset timer (VERY IMPORTANT)
+  const resetTimerRef = useRef(null);
+
+  // 🔄 Reset quiz ONLY for wrong answer
+  const resetQuiz = () => {
+    setAnswers({});
+    setResult(null);
+  };
+
   // ✅ Load quiz
   useEffect(() => {
     getQuiz(id)
       .then((data) => setQuiz(data))
-      .catch(() => alert("Failed to load quiz"));
+      .catch(() => toast.error("Failed to load quiz"));
   }, [id]);
 
   // Select answer
@@ -26,7 +36,7 @@ export default function QuizPage() {
   // Submit quiz
   const handleSubmit = async () => {
     if (Object.keys(answers).length === 0) {
-      alert("❌ Please select at least one answer before submitting");
+      toast.error("❌ Please select at least one answer before submitting");
       return;
     }
 
@@ -35,12 +45,25 @@ export default function QuizPage() {
       setResult(res);
 
       if (res.passed) {
-        alert("🎉 Quiz passed!");
+        toast.success("🎉 Quiz passed!");
+
+        // ❌ cancel any pending reset
+        if (resetTimerRef.current) {
+          clearTimeout(resetTimerRef.current);
+          resetTimerRef.current = null;
+        }
+
       } else {
-        alert("❌ Some answers are wrong. Try again.");
+        toast.error("❌ Some answers are wrong. Try again.");
+
+        // ✅ auto reset ONLY for failure
+        resetTimerRef.current = setTimeout(() => {
+          resetQuiz();
+        }, 1500);
       }
-    } catch {
-      alert("Quiz submit failed");
+
+    } catch (err) {
+      toast.error("Quiz submit failed");
     }
   };
 

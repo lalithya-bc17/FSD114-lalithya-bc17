@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import civoraLogo from "../assets/civora-logo.png";
 import "./Signup.css";
+import { toast } from "react-toastify";
 
 
 export default function Signup() {
@@ -28,15 +29,15 @@ export default function Signup() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "Signup failed");
+        toast.error(data.error || "Signup failed");
         return;
       }
 
-      alert("Signup successful! Please login.");
+      toast.success("Signup successful! Please login.");
       navigate("/login");
     } catch (err) {
       console.error(err);
-      alert("Server error. Try again.");
+      toast.error("Server error. Try again.");
     }
   };
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -11,7 +12,7 @@ export default function AdminUsers() {
     })
       .then(res => res.json())
       .then(data => setUsers(data))
-      .catch(() => alert("Failed to load users"));
+      .catch(() => toast.error("Failed to load users"));
   }, []);
 
   return (

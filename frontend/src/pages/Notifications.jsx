@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { toast } from "react-toastify";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const token = localStorage.getItem("access");
 
   // Fetch notifications
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     try {
       const res = await fetch(
         "https://certificate-verification-backend-7gpb.onrender.com/api/notifications/",
@@ -19,9 +20,9 @@ export default function Notifications() {
       const data = await res.json();
       setNotifications(data);
     } catch (err) {
-      alert("Failed to load notifications");
+      toast.error("Failed to load notifications");
     }
-  };
+  }, [token]); // ✅ dependency handled correctly
 
   // Mark notification as read
   const markAsRead = async (id) => {
@@ -36,16 +37,16 @@ export default function Notifications() {
         }
       );
 
-      // Reload notifications after marking read
-      loadNotifications();
+      loadNotifications(); // refresh list
     } catch (err) {
-      alert("Failed to mark as read");
+      toast.error("Failed to mark as read");
     }
   };
 
+  // Load on mount
   useEffect(() => {
     loadNotifications();
-  }, []);
+  }, [loadNotifications]); // ✅ ESLint satisfied
 
   return (
     <div style={{ padding: "20px", maxWidth: "700px", margin: "auto" }}>

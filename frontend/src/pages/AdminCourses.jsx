@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function AdminCourses() {
   const [courses, setCourses] = useState([]);
@@ -11,7 +12,7 @@ export default function AdminCourses() {
     })
       .then(res => res.json())
       .then(data => setCourses(data))
-      .catch(() => alert("Failed to load courses"));
+      .catch(() => toast.error("Failed to load courses"));
   }, []);
 
   return (

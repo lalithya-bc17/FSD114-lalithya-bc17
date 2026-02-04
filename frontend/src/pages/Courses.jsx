@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { enrollCourse } from "../api"; // ✅ this path is correct if api.js is in src/
+import { toast } from "react-toastify";
 
 const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
@@ -31,10 +32,10 @@ export default function Courses() {
   const handleEnroll = async (courseId) => {
     try {
       await enrollCourse(courseId);
-      alert("Enrolled successfully!");
-      navigate("/dashboard"); // ✅ redirect after enroll
+      toast.success("Enrolled successfully!");
+      navigate("/student/dashboard",{ replace: true }); // ✅ redirect after enroll
     } catch (err) {
-      alert("Already enrolled or error occurred");
+      toast.error("Already enrolled or error occurred");
     }
   };
 

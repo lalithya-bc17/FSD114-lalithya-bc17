@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getCourseLessons } from "../api";
 import "../styles.css";
+import { toast } from "react-toastify";
 
 export default function CoursePage() {
   const { id: courseId } = useParams();
@@ -59,11 +60,11 @@ export default function CoursePage() {
 
         const handleClick = () => {
           if (!lesson.unlocked) {
-            alert("This lesson is locked!");
+            toast.error("This lesson is locked!");
             return;
           }
           if (!prevCompleted) {
-            alert("Please complete the previous lesson first!");
+            toast.error("Please complete the previous lesson first!");
             return;
           }
 

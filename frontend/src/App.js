@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // 🌍 Public pages
 import Home from "./pages/Home";
@@ -151,6 +153,20 @@ export default function App() {
         />
 
       </Routes>
+      <>
+  <Routes>
+    {/* your routes */}
+  </Routes>
+
+  <ToastContainer
+    position="top-right"
+    autoClose={3000}
+    hideProgressBar={false}
+    closeOnClick
+    pauseOnHover
+    theme="light"
+  />
+</>
     </BrowserRouter>
   );
 }

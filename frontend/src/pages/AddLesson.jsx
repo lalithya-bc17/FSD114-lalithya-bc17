@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
@@ -28,13 +29,13 @@ export default function AddLesson() {
     });
 
     if (res.ok) {
-      alert("Lesson created ✅");
+      toast.success("Lesson created ✅");
       setTitle("");
       setContent("");
       setCourseId("");
       setOrder("");
     } else {
-      alert("Failed to create lesson ❌");
+      toast.error("Failed to create lesson ❌");
     }
   };
 
