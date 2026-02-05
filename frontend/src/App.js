@@ -16,14 +16,17 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 
 // 📚 Learning pages
-
 import CoursePage from "./pages/CoursePage";
 import LessonPage from "./pages/LessonPage";
 import QuizPage from "./pages/QuizPage";
+
+// 👩‍🏫 Teacher pages
 import TeacherCourses from "./pages/TeacherCourses";
-import AddLesson from "./pages/AddLesson";
+import TeacherCourseDetail from "./pages/TeacherCourseDetail";
 import TeacherQuizzes from "./pages/TeacherQuizzes";
 import TeacherStudents from "./pages/TeacherStudents";
+import TeacherLessonDetail from "./pages/TeacherLessonDetail";
+
 
 /* =========================
    🔐 ROLE-BASED ROUTE
@@ -47,7 +50,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* 🌍 PUBLIC */}
         <Route path="/" element={<Home />} />
         <Route path="/courses" element={<Courses />} />
@@ -68,63 +70,7 @@ export default function App() {
           }
         />
 
-        {/* 👩‍🏫 TEACHER */}
-        {/* 👩‍🏫 TEACHER */}
-<Route
-  path="/teacher/dashboard"
-  element={
-    <PrivateRoute role="teacher">
-      <TeacherDashboard />
-    </PrivateRoute>
-  }
-/>
-
-<Route
-  path="/teacher/courses"
-  element={
-    <PrivateRoute role="teacher">
-      <TeacherCourses />
-    </PrivateRoute>
-  }
-/>
-
-<Route
-  path="/teacher/add-lesson"
-  element={
-    <PrivateRoute role="teacher">
-      <AddLesson />
-    </PrivateRoute>
-  }
-/>
-<Route
-  path="/teacher/quizzes"
-  element={
-    <PrivateRoute role="teacher">
-      <TeacherQuizzes />
-    </PrivateRoute>
-  }
-/>
-
-<Route
-  path="/teacher/students"
-  element={
-    <PrivateRoute role="teacher">
-      <TeacherStudents />
-    </PrivateRoute>
-  }
-/>
-
-        {/* 🛠 ADMIN */}
-        <Route
-          path="/admin/dashboard"
-          element={
-            <PrivateRoute role="admin">
-              <AdminDashboard />
-            </PrivateRoute>
-          }
-        />
-
-        {/* 📚 LEARNING FLOW (STUDENT ONLY) */}
+        {/* 📚 STUDENT LEARNING FLOW */}
         <Route
           path="/course/:id"
           element={
@@ -152,21 +98,93 @@ export default function App() {
           }
         />
 
-      </Routes>
-      <>
-  <Routes>
-    {/* your routes */}
-  </Routes>
+        {/* 👩‍🏫 TEACHER */}
+        <Route
+          path="/teacher/dashboard"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherDashboard />
+            </PrivateRoute>
+          }
+        />
 
-  <ToastContainer
-    position="top-right"
-    autoClose={3000}
-    hideProgressBar={false}
-    closeOnClick
-    pauseOnHover
-    theme="light"
-  />
-</>
+        <Route
+          path="/teacher/courses"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherCourses />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/teacher/course/:courseId"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherCourseDetail />
+            </PrivateRoute>
+          }
+        />
+        {/* 👩‍🏫 TEACHER LESSON EDIT */}
+<Route
+  path="/teacher/lesson/:lessonId"
+  element={
+    <PrivateRoute role="teacher">
+      <TeacherLessonDetail />
+    </PrivateRoute>
+  }
+/>
+
+{/* 👩‍🏫 TEACHER QUIZ EDIT */}
+<Route
+  path="/teacher/quiz/:quizId"
+  element={
+    <PrivateRoute role="teacher">
+      <TeacherQuizzes />
+    </PrivateRoute>
+  }
+/>
+
+
+        
+        <Route
+          path="/teacher/quizzes"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherQuizzes />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/teacher/students"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherStudents />
+            </PrivateRoute>
+          }
+        />
+
+        {/* 🛠 ADMIN */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <PrivateRoute role="admin">
+              <AdminDashboard />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+
+      {/* 🔔 TOASTS */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        theme="light"
+      />
     </BrowserRouter>
   );
 }

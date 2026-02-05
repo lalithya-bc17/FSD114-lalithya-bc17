@@ -25,9 +25,9 @@ export default function TeacherDashboard() {
 
         <div className="card">
           <h3>Add Lesson</h3>
-          <p>Create lessons for courses</p>
-          <button onClick={() => navigate("/teacher/add-lesson")}>
-            Add Lesson
+          <p>Select a course to add lessons</p>
+          <button onClick={() => navigate("/teacher/courses")}>
+            Go to Courses
           </button>
         </div>
 

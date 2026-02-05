@@ -760,14 +760,82 @@ def teacher_courses(request):
     return Response(data)
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated,IsTeacher])
-def teacher_add_lesson(request):
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_add_lesson(request, course_id):
+    teacher = request.user.teacher
+
+    try:
+        course = Course.objects.get(id=course_id, teacher=teacher)
+    except Course.DoesNotExist:
+        return Response(
+            {"detail": "You do not own this course"},
+            status=403
+        )
+
+    order = Lesson.objects.filter(course=course).count() + 1
+
     Lesson.objects.create(
         title=request.data["title"],
         content=request.data.get("content", ""),
-        course_id=request.data["course"],
-        order=request.data["order"]
+        video_url=request.data.get("video_url"),
+        course=course,
+        order=order
     )
+
+    return Response({"success": True}, status=201)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_add_lesson_by_course(request, course_id):
+    teacher = request.user.teacher
+
+    course = get_object_or_404(
+        Course,
+        id=course_id,
+        teacher=teacher
+    )
+
+    Lesson.objects.create(
+        course=course,
+        title=request.data["title"],
+        content=request.data.get("content", ""),
+        order=Lesson.objects.filter(course=course).count() + 1,
+    )
+
+    return Response({"success": True}, status=201)
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+
+from .models import Lesson
+from courses.permissions import IsTeacher
+
+@api_view(["GET", "PATCH"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_lesson_detail(request, lesson_id):
+    lesson = get_object_or_404(
+        Lesson,
+        id=lesson_id,
+        course__teacher=request.user.teacher
+    )
+
+    if request.method == "GET":
+        return Response({
+            "id": lesson.id,
+            "title": lesson.title,
+            "content": lesson.content,
+            "video_url": lesson.video_url,
+            "order": lesson.order,
+        })
+
+    # PATCH
+    lesson.video_url = request.data.get("video_url", lesson.video_url)
+    lesson.title = request.data.get("title", lesson.title)
+    lesson.content = request.data.get("content", lesson.content)
+    lesson.save()
+
     return Response({"success": True})
 
 @api_view(["GET"])

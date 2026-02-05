@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
@@ -6,36 +7,32 @@ export default function TeacherCourses() {
   const [courses, setCourses] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("access");
+  const navigate = useNavigate();
 
-  // 🔹 Load teacher courses
-  const loadCourses = () => {
+  // ✅ STABLE function (important)
+  const loadCourses = useCallback(() => {
     fetch(`${API}/teacher/my-courses/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then(res => {
-        if (!res.ok) throw new Error("Not authorized");
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => setCourses(data))
       .catch(err => console.error(err));
-  };
+  }, [token]);
 
+  // ✅ Load once on page load
   useEffect(() => {
     loadCourses();
-  }, []);
+  }, [loadCourses]);
 
-  // 🔹 Create new course (TEACHER ONLY)
+  // ✅ Create course
   const createCourse = () => {
-    if (!title) {
+    if (!title.trim()) {
       alert("Title required");
       return;
     }
-
-    setLoading(true);
 
     fetch(`${API}/teacher/create-course/`, {
       method: "POST",
@@ -44,25 +41,21 @@ export default function TeacherCourses() {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        title: title,
-        description: description,
+        title,
+        description,
       }),
     })
       .then(res => {
-        if (!res.ok) throw new Error("Failed to create");
+        if (!res.ok) throw new Error("Create failed");
         return res.json();
       })
       .then(() => {
         setTitle("");
         setDescription("");
-        loadCourses();
+        loadCourses(); // ✅ now works
         alert("Course created");
       })
-      .catch(err => {
-        console.error(err);
-        alert("Error creating course");
-      })
-      .finally(() => setLoading(false));
+      .catch(() => alert("Error creating course"));
   };
 
   return (
@@ -81,9 +74,7 @@ export default function TeacherCourses() {
           value={description}
           onChange={e => setDescription(e.target.value)}
         />
-        <button onClick={createCourse} disabled={loading}>
-          {loading ? "Creating..." : "Create Course"}
-        </button>
+        <button onClick={createCourse}>Create Course</button>
       </div>
 
       <hr />
@@ -92,11 +83,15 @@ export default function TeacherCourses() {
       {courses.length === 0 && <p>No courses yet</p>}
 
       {courses.map(course => (
-        <div key={course.id} className="card">
-          <h3>{course.title}</h3>
-          <p>{course.description}</p>
-        </div>
-      ))}
+  <div key={course.id} className="card">
+    <h3>{course.title}</h3>
+    <p>{course.description}</p>
+
+    <button onClick={() => navigate(`/teacher/course/${course.id}`)}>
+      Manage
+    </button>
+  </div>
+))}
     </div>
   );
 }
