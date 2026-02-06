@@ -26,6 +26,7 @@ import TeacherCourseDetail from "./pages/TeacherCourseDetail";
 import TeacherQuizzes from "./pages/TeacherQuizzes";
 import TeacherStudents from "./pages/TeacherStudents";
 import TeacherLessonDetail from "./pages/TeacherLessonDetail";
+import TeacherLessonQuiz from "./pages/TeacherLessonQuiz";
 
 
 /* =========================
@@ -125,25 +126,27 @@ export default function App() {
             </PrivateRoute>
           }
         />
-        {/* 👩‍🏫 TEACHER LESSON EDIT */}
-<Route
-  path="/teacher/lesson/:lessonId"
-  element={
-    <PrivateRoute role="teacher">
-      <TeacherLessonDetail />
-    </PrivateRoute>
-  }
-/>
 
-{/* 👩‍🏫 TEACHER QUIZ EDIT */}
-<Route
-  path="/teacher/quiz/:quizId"
-  element={
-    <PrivateRoute role="teacher">
-      <TeacherQuizzes />
-    </PrivateRoute>
-  }
-/>
+        {/* 👩‍🏫 TEACHER LESSON EDIT */}
+        <Route
+         path="/teacher/lesson/:lessonId"
+          element={
+          <PrivateRoute role="teacher">
+            <TeacherLessonDetail />
+          </PrivateRoute>
+          }
+        />
+
+
+
+        <Route
+         path="/teacher/lesson/:lessonId/quiz"
+         element={
+          <PrivateRoute role="teacher">
+           <TeacherLessonQuiz />
+          </PrivateRoute>
+          }
+        />
 
 
         

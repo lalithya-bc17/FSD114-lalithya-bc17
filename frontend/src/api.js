@@ -182,3 +182,78 @@ export const enrollCourse = async (courseId) => {
 
   return data;
 };
+/* ======================
+   TEACHER LESSON APIs
+====================== */
+
+export const getTeacherLesson = async (lessonId) => {
+  const res = await fetch(
+    `${API}/teacher/lesson/${lessonId}/`,
+    {
+      headers: authHeader(),
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    console.error("GET TEACHER LESSON ERROR:", data);
+    throw data;
+  }
+
+  return data;
+};
+
+export const updateTeacherLessonVideo = async (lessonId, videoUrl) => {
+  const res = await fetch(
+    `${API}/teacher/lesson/${lessonId}/`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeader(),
+      },
+      body: JSON.stringify({ video_url: videoUrl }),
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    console.error("UPDATE TEACHER LESSON ERROR:", data);
+    throw data;
+  }
+
+  return data;
+};
+/* ======================
+   TEACHER DELETE LESSON
+====================== */
+
+// ======================
+// TEACHER DELETE LESSON
+// ======================
+
+
+export const deleteTeacherLesson = async (lessonId) => {
+  const res = await fetch(
+    `${API}/teacher/lesson/${lessonId}/delete/`,
+    {
+      method: "DELETE",
+      headers: {
+        ...authHeader(),
+      },
+    }
+  );
+
+  if (!res.ok) {
+    let data = {};
+    try {
+      data = await res.json();
+    } catch (e) {}
+    console.error("DELETE LESSON ERROR:", res.status, data);
+    throw data;
+  }
+
+  return true;
+};

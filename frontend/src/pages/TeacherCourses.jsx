@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 
 const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 
@@ -30,7 +32,7 @@ export default function TeacherCourses() {
   // ✅ Create course
   const createCourse = () => {
     if (!title.trim()) {
-      alert("Title required");
+      toast.error("Title required");
       return;
     }
 
@@ -53,9 +55,9 @@ export default function TeacherCourses() {
         setTitle("");
         setDescription("");
         loadCourses(); // ✅ now works
-        alert("Course created");
+        toast.success("Course created");
       })
-      .catch(() => alert("Error creating course"));
+      .catch(() => toast.error("Error creating course"));
   };
 
   return (

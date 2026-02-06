@@ -11,30 +11,28 @@ export default function TeacherCourseDetail() {
 
   const [lessons, setLessons] = useState([]);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔄 Load lessons (teacher view)
+  // 🔄 Load lessons
   const loadLessons = useCallback(async () => {
-  const res = await fetch(
-    `${API}/courses/${courseId}/lessons/`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+    const res = await fetch(
+      `${API}/courses/${courseId}/lessons/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-  const data = await res.json();
-  setLessons(data.courses || []);
-}, [courseId, token]);
+    const data = await res.json();
+    setLessons(data.courses || []);
+  }, [courseId, token]);
 
-  // 🔁 Load once
   useEffect(() => {
-  loadLessons();
-}, [loadLessons]);
+    loadLessons();
+  }, [loadLessons]);
 
-  // ➕ Create lesson
+  // ➕ CREATE LESSON (TITLE ONLY)
   const createLesson = async () => {
     if (!title.trim()) {
       toast.error("Lesson title required");
@@ -51,7 +49,7 @@ export default function TeacherCourseDetail() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ title }), // ✅ TITLE ONLY
       }
     );
 
@@ -60,8 +58,7 @@ export default function TeacherCourseDetail() {
     if (res.ok) {
       toast.success("Lesson created ✅");
       setTitle("");
-      setContent("");
-      loadLessons(); // 🔥 AUTO-REFRESH
+      loadLessons();
     } else {
       toast.error("Permission denied ❌");
     }
@@ -71,18 +68,12 @@ export default function TeacherCourseDetail() {
     <div className="container">
       <h2>Manage Course</h2>
 
-      {/* ADD LESSON */}
+      {/* CREATE LESSON */}
       <div className="card">
         <input
           placeholder="Lesson title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <textarea
-          placeholder="Lesson content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
         />
 
         <button onClick={createLesson} disabled={loading}>
@@ -102,11 +93,12 @@ export default function TeacherCourseDetail() {
           <strong>
             {l.order}. {l.title}
           </strong>
-        <button
-          onClick={() => navigate(`/teacher/lesson/${l.id}`)}
-        >
-         Edit Lesson
-        </button>
+
+          <button onClick={() => navigate(`/teacher/lesson/${l.id}`)}>
+            Edit Lesson
+          </button>
+          
+
           <p>Status: {l.status}</p>
         </div>
       ))}

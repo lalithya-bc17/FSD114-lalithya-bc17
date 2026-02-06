@@ -4,7 +4,7 @@ Organization: Civora Nexus Pvt. Ltd.
 Project: EduVillage – Full Stack Learning Platform
 Intern Name: [Lalithya BC]
 
-Duration: January 15 – February 5, 2026
+Duration: January 25 – January 31, 2026
 Technology Stack: Django REST Framework, React.js, PostgreSQL, GitHub, Render
 
 📅 Week 4 – Teacher Module, Lesson Management & Video Integration
