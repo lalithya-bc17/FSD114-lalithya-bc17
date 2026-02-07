@@ -82,9 +82,13 @@ export default function TeacherLessonDetail() {
       await deleteTeacherLesson(lessonId);
       toast.success("Lesson deleted ✅");
       navigate(-1);
-    } catch {
-      toast.error("Cannot delete lesson ❌");
-    }
+    } catch (err) {
+       const msg =
+        err?.response?.data?.detail ||
+        "Cannot delete lesson. Students may have already attempted it.";
+
+      toast.error(msg);
+      }
   };
 
   if (loading) return <p>Loading...</p>;

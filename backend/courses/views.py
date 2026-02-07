@@ -759,6 +759,25 @@ def teacher_courses(request):
 
     return Response(data)
 
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_update_course(request, course_id):
+    course = get_object_or_404(
+        Course,
+        id=course_id,
+        teacher=request.user.teacher
+    )
+
+    course.title = request.data.get("title", course.title)
+    course.description = request.data.get("description", course.description)
+    course.save()
+
+    return Response({
+        "id": course.id,
+        "title": course.title,
+        "description": course.description,
+    })
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated, IsTeacher])
 def teacher_add_lesson(request, course_id):
@@ -852,18 +871,25 @@ from courses.models import Lesson
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated, IsTeacher])
 def teacher_delete_lesson(request, lesson_id):
-    teacher = request.user.teacher
-
     lesson = get_object_or_404(
         Lesson,
         id=lesson_id,
-        course__teacher=teacher
+        course__teacher=request.user.teacher
     )
 
-    # ✅ ONLY correct safety check
-    if Quiz.objects.filter(lesson=lesson).exists():
+    # ❌ Block if ANY quiz attempt exists
+    if StudentAnswer.objects.filter(
+        question__quiz__lesson=lesson
+    ).exists():
         return Response(
-            {"detail": "Cannot delete lesson with quiz"},
+            {"detail": "Cannot delete. Quiz already attempted."},
+            status=400
+        )
+
+    # ❌ Block if certificate already issued
+    if Certificate.objects.filter(course=lesson.course).exists():
+        return Response(
+            {"detail": "Cannot delete. Certificates already issued."},
             status=400
         )
 
@@ -888,32 +914,57 @@ def teacher_quizzes(request):
 
     return Response(data)
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated, IsTeacher])
-def teacher_create_quiz(request, lesson_id):
+def teacher_lesson_quiz(request, lesson_id):
     lesson = get_object_or_404(
         Lesson,
         id=lesson_id,
         course__teacher=request.user.teacher
     )
 
-    if lesson.quiz:
-        return Response(
-            {"detail": "Quiz already exists.You can only add questions"},
-            status=400
+    # 🔹 GET → return existing quiz
+    if request.method == "GET":
+        if not lesson.quiz:
+            return Response(
+                {"detail": "Quiz does not exist"},
+                status=404
+            )
+
+        quiz = lesson.quiz
+        return Response({
+            "id": quiz.id,
+            "title": quiz.title
+        })
+
+    # 🔹 POST → create OR return existing quiz
+    if request.method == "POST":
+        if lesson.quiz:
+            quiz = lesson.quiz
+            return Response(
+                {
+                    "id": quiz.id,
+                    "title": quiz.title,
+                    "created": False
+                },
+                status=200
+            )
+
+        quiz = Quiz.objects.create(
+            title=request.data.get("title", "Lesson Quiz")
         )
 
-    quiz = Quiz.objects.create(
-        title=request.data.get("title", "Lesson Quiz")
-    )
+        lesson.quiz = quiz
+        lesson.save()
 
-    lesson.quiz = quiz
-    lesson.save()
-
-    return Response(
-        {"id": quiz.id, "title": quiz.title},
-        status=201
-    )
+        return Response(
+            {
+                "id": quiz.id,
+                "title": quiz.title,
+                "created": True
+            },
+            status=201
+        )
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated, IsTeacher])
@@ -935,6 +986,90 @@ def teacher_add_question(request, quiz_id):
     )
 
     return Response({"success": True}, status=201)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_quiz_questions(request, quiz_id):
+    quiz = get_object_or_404(
+        Quiz,
+        id=quiz_id,
+        lesson__course__teacher=request.user.teacher
+    )
+
+    questions = quiz.questions.all()
+
+    data = []
+    for q in questions:
+        data.append({
+            "id": q.id,
+            "text": q.text,
+            "option_a": q.option_a,
+            "option_b": q.option_b,
+            "option_c": q.option_c,
+            "option_d": q.option_d,
+            "correct": q.correct,
+        })
+
+    return Response(data)
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_delete_question(request, question_id):
+    question = get_object_or_404(
+        Question,
+        id=question_id,
+        quiz__lesson__course__teacher=request.user.teacher
+    )
+
+    # ❌ Block if quiz already attempted
+    if StudentAnswer.objects.filter(question=question).exists():
+        return Response(
+            {"detail": "Cannot delete. Quiz already attempted."},
+            status=400
+        )
+
+    question.delete()
+    return Response({"detail": "Question deleted"}, status=204)
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_update_question(request, question_id):
+    question = get_object_or_404(
+        Question,
+        id=question_id,
+        quiz__lesson__course__teacher=request.user.teacher
+    )
+
+    question.text = request.data.get("text", question.text)
+    question.option_a = request.data.get("option_a", question.option_a)
+    question.option_b = request.data.get("option_b", question.option_b)
+    question.option_c = request.data.get("option_c", question.option_c)
+    question.option_d = request.data.get("option_d", question.option_d)
+    question.correct = request.data.get("correct", question.correct)
+
+    question.save()
+
+    return Response({"detail": "Question updated successfully"})
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_update_quiz(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+
+    # 🔒 SAFETY CHECK (VERY IMPORTANT)
+    if quiz.lesson.course.teacher != request.user.teacher:
+        return Response(
+            {"detail": "Not allowed"},
+            status=403
+        )
+
+    quiz.title = request.data.get("title", quiz.title)
+    quiz.save()
+
+    return Response({
+        "id": quiz.id,
+        "title": quiz.title,
+    })
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsTeacher])
