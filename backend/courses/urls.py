@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import teacher_add_question, teacher_create_course, teacher_courses,  teacher_delete_question,  teacher_lesson_quiz, teacher_quiz_questions, teacher_update_question, teacher_update_quiz
+from .views import teacher_add_question, teacher_create_course, teacher_my_courses,  teacher_delete_question,  teacher_lesson_quiz, teacher_quiz_questions, teacher_update_question, teacher_update_quiz
 
 urlpatterns = [
 
@@ -32,7 +32,7 @@ urlpatterns = [
     path("notifications/<int:id>/read/", views.mark_notification_read_api),
     path("notifications/unread-count/", views.unread_notification_count_api),
     path("teacher/create-course/", views.teacher_create_course),
-    path("teacher/my-courses/", views.teacher_courses),
+    path("teacher/my-courses/", views.teacher_my_courses),
 
     
     path(

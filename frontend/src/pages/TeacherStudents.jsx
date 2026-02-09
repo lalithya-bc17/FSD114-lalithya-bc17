@@ -7,14 +7,24 @@ export default function TeacherStudents() {
   const token = localStorage.getItem("access");
 
   useEffect(() => {
+    if (!token) return;
+
     fetch(`${API}/teacher/students/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then((res) => res.json())
-      .then(setStudents)
-      .catch(console.error);
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch students");
+        }
+        return res.json();
+      })
+      .then((data) => setStudents(data))
+      .catch((err) => {
+        console.error(err);
+        setStudents([]);
+      });
   }, [token]);
 
   return (

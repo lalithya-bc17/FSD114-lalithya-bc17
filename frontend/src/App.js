@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 // 🌍 Public pages
 import Home from "./pages/Home";
 import Courses from "./pages/Courses";
-import VerifyCertificate from "./pages/VerifyCertificate";
+
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Notifications from "./pages/Notifications";
@@ -54,7 +54,7 @@ export default function App() {
         {/* 🌍 PUBLIC */}
         <Route path="/" element={<Home />} />
         <Route path="/courses" element={<Courses />} />
-        <Route path="/verify" element={<VerifyCertificate />} />
+        
 
         {/* 🔐 AUTH */}
         <Route path="/login" element={<Login />} />

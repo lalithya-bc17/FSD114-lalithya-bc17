@@ -6,6 +6,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("access");
   const name = localStorage.getItem("name");
+  const role = localStorage.getItem("role"); // student | teacher | admin
 
   const handleLogout = () => {
     localStorage.clear();
@@ -24,10 +25,15 @@ export default function Navbar() {
         Edu<span>Village</span>
       </div>
 
-      {/* RIGHT MENU */}
+      {/* LINKS */}
       <div className="nav-links">
         <Link to="/">Home</Link>
-        <Link to="/courses">Courses</Link>
+
+        {/* ⭐ ROLE-BASED COURSES (TEXT LINK, NOT BUTTON) */}
+        <Link to={role === "teacher" ? "/teacher/courses" : "/courses"}>
+          Courses
+        </Link>
+
         <Link to="/verify">Verify</Link>
         <Link to="/notifications">Notifications</Link>
 
@@ -37,14 +43,26 @@ export default function Navbar() {
             Sign Up
           </Link>
         )}
-        
 
         {token && (
           <>
-            <span className="nav-user">
-              👋 Hello, {name}
-            </span>
-            <Link to="/student/dashboard">Dashboard</Link>
+            {/* 👋 TEXT ONLY — NO BUTTON */}
+            <span className="nav-user">👋 Hello, {name}</span>
+
+            {/* ROLE-BASED DASHBOARD */}
+            <Link
+              to={
+                role === "teacher"
+                  ? "/teacher/dashboard"
+                  : role === "admin"
+                  ? "/admin/dashboard"
+                  : "/student/dashboard"
+              }
+            >
+              Dashboard
+            </Link>
+
+            {/* LOGOUT can stay button or link */}
             <button className="logout-btn" onClick={handleLogout}>
               Logout
             </button>
