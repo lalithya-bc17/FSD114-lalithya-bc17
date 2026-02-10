@@ -29,7 +29,10 @@ export default function TeacherCourses() {
       },
     })
       .then((res) => res.json())
-      .then((data) => setCourses(data))
+      .then((data) => {
+      const list = Array.isArray(data) ? data : data.courses || [];
+      setCourses(list);
+    })
       .catch(() => toast.error("Failed to load courses"));
   }, [token]);
 

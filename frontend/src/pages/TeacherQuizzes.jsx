@@ -16,9 +16,11 @@ export default function TeacherQuizzes() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setQuizzes(data);
-        setLoading(false);
-      })
+  // ✅ normalize response
+      const list = Array.isArray(data) ? data : data.quizzes || [];
+      setQuizzes(list);
+      setLoading(false);
+    })
       .catch((err) => {
         console.error("Failed to load quizzes", err);
         setLoading(false);

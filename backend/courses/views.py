@@ -511,14 +511,14 @@ from django.conf import settings
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def certificate(request, course_id):
-    user = request.user                  # ✅ User
-    student = request.user.student       # ✅ Student profile
+    user = request.user
+    student = request.user.student
 
     course = get_object_or_404(Course, id=course_id)
 
     total = course.lessons.count()
     done = Progress.objects.filter(
-        student=student,                 # Student model
+        student=student,
         lesson__course=course,
         completed=True
     ).count()
@@ -526,32 +526,32 @@ def certificate(request, course_id):
     if done != total:
         return HttpResponse("You have not completed this course.", status=403)
 
-    certificate_obj, created = Certificate.objects.get_or_create(
-        student=user,                    # ✅ User model (matches Certificate)
-        course=course,
-    )
-    if not certificate_obj.issued_at:
-        certificate_obj.issued_at = now()
-        certificate_obj.save()
+    certificate = Certificate.objects.filter(
+        student=user,
+        course=course
+    ).first()
 
-    if created:
-       Notification.objects.create(
-        user=request.user,
-        message="Your certificate has been generated ✅"
-    )
-    
-
-    # 🚫 Block revoked certificates from downloading
-
-    if certificate_obj.is_revoked:
+    # 🔒 HARD BLOCK REVOKED CERTIFICATES (THIS IS KEY)
+    if certificate and certificate.is_revoked:
         return HttpResponse("This certificate has been revoked.", status=403)
 
-    RENDER_BASE_URL = "https://certificate-verification-backend-7gpb.onrender.com"
+    # Create certificate ONLY ONCE
+    if not certificate:
+        certificate = Certificate.objects.create(
+            student=user,
+            course=course,
+            issued_at=now()
+        )
 
-    verify_url = f"https://certificate-verification-backend-7gpb.onrender.com/verify-certificate/{certificate_obj.id}/" 
-    print("VERIFY URL:", verify_url)
-    
-    
+        Notification.objects.create(
+            user=request.user,
+            message="Your certificate has been generated ✅"
+        )
+
+    verify_url = (
+        f"https://certificate-verification-backend-7gpb.onrender.com/"
+        f"verify-certificate/{certificate.id}/"
+    )
 
     qr = qrcode.make(verify_url)
     buffer = BytesIO()
@@ -569,18 +569,19 @@ def certificate(request, course_id):
         {
             "student_name": user.get_full_name() or user.username,
             "course_name": course.title,
-            "date": now().strftime("%d %B %Y"),
+            "date": certificate.issued_at.strftime("%d %B %Y"),
             "logo_path": logo_path,
             "people_icon": people_icon,
             "qr_base64": qr_base64,
         }
     )
 
-    html = HTML(string=html_string)
-    pdf = html.write_pdf()
+    pdf = HTML(string=html_string).write_pdf()
 
     response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="{course.title}_certificate.pdf"'
+    response["Content-Disposition"] = (
+        f'attachment; filename="{course.title}_certificate.pdf"'
+    )
     return response
 
 @api_view(["POST"])
@@ -718,11 +719,6 @@ def unread_notification_count_api(request):
     ).count()
     return Response({"count": count})
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from core.permissions import IsTeacher
-from .models import Course
 
 
 from rest_framework.decorators import api_view, permission_classes
@@ -1106,6 +1102,185 @@ def teacher_students(request):
 
     return Response(data)
 
+
+from django.db.models import Count
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from django.http import JsonResponse
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_analytics(request):
+    user = request.user
+
+    # Ensure teacher
+    if not hasattr(user, "teacher"):
+        return Response({"detail": "Not allowed"}, status=403)
+
+    teacher = user.teacher
+
+    courses = Course.objects.filter(teacher=teacher)
+
+    courses_created = courses.count()
+
+    total_students = Enrollment.objects.filter(
+        course__in=courses
+    ).values("student").distinct().count()
+
+    certificates_issued = Certificate.objects.filter(
+        course__in=courses
+    ).count()
+
+    # ✅ COMPLETION RATE (correct logic)
+    total_lessons = Lesson.objects.filter(course__in=courses).count()
+    completed_lessons = Progress.objects.filter(
+        lesson__course__in=courses,
+        completed=True
+    ).count()
+
+    completion_rate = 0
+    if total_lessons > 0:
+        completion_rate = round(
+            (completed_lessons / total_lessons) * 100, 2
+        )
+
+    return Response({
+        "courses_created": courses_created,
+        "total_students": total_students,
+        "certificates_issued": certificates_issued,
+        "completion_rate": completion_rate,
+    })
+
+from django.db.models import Count, Q
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_course_completion(request):
+    user = request.user
+
+    if not hasattr(user, "teacher"):
+        return Response([], status=200)
+
+    teacher = user.teacher
+    data = []
+
+    courses = Course.objects.filter(teacher=teacher)
+
+    for course in courses:
+        students = Enrollment.objects.filter(course=course).count()
+
+        completed = Certificate.objects.filter(
+            course=course,
+            is_revoked=False
+        ).values("student").distinct().count()
+
+        completion = round((completed / students) * 100, 2) if students > 0 else 0
+
+        data.append({
+            "course": course.title,
+            "course_id": course.id,
+            "students": students,
+            "completion": completion,
+        })
+
+    return Response(data)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_certificates(request):
+    user = request.user
+
+    # Ensure user is a teacher
+    if not hasattr(user, "teacher"):
+        return Response([], status=200)
+
+    certificates = Certificate.objects.filter(
+        course__teacher=user.teacher
+    ).select_related("student", "course")
+
+    data = []
+    for cert in certificates:
+        data.append({
+            "id": str(cert.id),
+            "student": cert.student.get_full_name() or cert.student.username,
+            "course": cert.course.title,
+            "issued_at": cert.issued_at,
+            "is_revoked": cert.is_revoked,
+        })
+
+    return Response(data)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def revoke_certificate_teacher(request, cert_id):
+    certificate = get_object_or_404(
+        Certificate,
+        id=cert_id,
+        course__teacher=request.user.teacher
+    )
+
+    certificate.is_revoked = True
+    certificate.save()
+
+    return Response({"status": "revoked"})
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def course_student_analytics(request, course_id):
+    teacher = request.user.teacher
+    course = get_object_or_404(Course, id=course_id, teacher=teacher)
+
+    total_lessons = course.lessons.count()
+    data = []
+
+    enrollments = Enrollment.objects.filter(
+        course=course
+    ).select_related("student__user")
+
+    for enrollment in enrollments:
+        student = enrollment.student
+
+        completed_count = Progress.objects.filter(
+            student=student,
+            lesson__course=course,
+            completed=True
+        ).count()
+
+        completion_percent = (
+            round((completed_count / total_lessons) * 100, 2)
+            if total_lessons > 0 else 0
+        )
+
+        completed = completed_count == total_lessons and total_lessons > 0
+
+        certificate = Certificate.objects.filter(
+            student=student.user,   # ✅ correct
+            course=course
+        ).first()
+
+        data.append({
+            "student": student.user.get_full_name() or student.user.username,
+            "completed_lessons": completed_count,
+            "total_lessons": total_lessons,
+            "completion_percent": completion_percent,
+            "completed": completed,
+            "certificate_status": (
+                "revoked" if certificate and certificate.is_revoked else
+                "issued" if certificate else
+                "not_issued"
+            )
+        })
+
+    return Response(data)
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser

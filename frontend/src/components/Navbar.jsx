@@ -1,17 +1,36 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react"; // 🔴 NEW
 import "../styles.css";
+
+const API = "https://certificate-verification-backend-7gpb.onrender.com/api"; // 🔴 NEW
 
 export default function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("access");
   const name = localStorage.getItem("name");
-  const role = localStorage.getItem("role"); // student | teacher | admin
+  const role = localStorage.getItem("role");
+
+  const [unreadCount, setUnreadCount] = useState(0); // 🔴 NEW
 
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
   };
+
+  // 🔴 NEW — fetch unread notification count
+  useEffect(() => {
+    if (!token) return;
+
+    fetch(`${API}/notifications/unread-count/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setUnreadCount(data.count || 0))
+      .catch(() => {});
+  }, [token]);
 
   return (
     <motion.nav
@@ -29,13 +48,36 @@ export default function Navbar() {
       <div className="nav-links">
         <Link to="/">Home</Link>
 
-        {/* ⭐ ROLE-BASED COURSES (TEXT LINK, NOT BUTTON) */}
         <Link to={role === "teacher" ? "/teacher/courses" : "/courses"}>
           Courses
         </Link>
 
         <Link to="/verify">Verify</Link>
-        <Link to="/notifications">Notifications</Link>
+
+        {/* 🔔 NOTIFICATIONS WITH RED BADGE */}
+          <Link to="/notifications" style={{ position: "relative", fontSize: "18px" }}
+           className={unreadCount > 0 ? "bell-animate" : ""}
+          >
+           🔔
+
+          {unreadCount > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                top: "-6px",
+                right: "-14px",
+                background: "red",
+                color: "white",
+                borderRadius: "50%",
+                padding: "2px 6px",
+                fontSize: "10px",
+                fontWeight: "bold",
+              }}
+            >
+              {unreadCount}
+            </span>
+          )}
+        </Link>
 
         {!token && <Link to="/login">Login</Link>}
         {!token && (
@@ -46,10 +88,8 @@ export default function Navbar() {
 
         {token && (
           <>
-            {/* 👋 TEXT ONLY — NO BUTTON */}
             <span className="nav-user">👋 Hello, {name}</span>
 
-            {/* ROLE-BASED DASHBOARD */}
             <Link
               to={
                 role === "teacher"
@@ -62,7 +102,6 @@ export default function Navbar() {
               Dashboard
             </Link>
 
-            {/* LOGOUT can stay button or link */}
             <button className="logout-btn" onClick={handleLogout}>
               Logout
             </button>

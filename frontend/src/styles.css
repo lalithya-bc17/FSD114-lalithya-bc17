@@ -1138,3 +1138,65 @@ body.dark .progress-bar {
 .logo:hover .village {
   color: #66ff99; /* lighter green on hover */
 }
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+/* 🔔 Soft notification bell animation */
+@keyframes bellPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bell-animate {
+  display: inline-block;   /* 🔴 THIS WAS MISSING */
+  animation: bellPulse 1.5s ease-in-out infinite;
+}
+
+.course-row:hover {
+  background-color: #f5f9fc;
+}
+
+.course-row:hover td {
+  background-color: #f5f9fc;
+}
+.course-table tbody tr:hover td {
+  background-color: #f2f7fb !important;
+  cursor: pointer;
+}
+.course-table {
+  display: table;
+}
+
+.course-table tr {
+  display: table-row;
+}
+
+.course-table td,
+.course-table th {
+  display: table-cell;
+}
+.course-table tbody tr:hover {
+  outline: 2px solid #dbeafe;
+  background-color: #f0f7ff !important;
+}

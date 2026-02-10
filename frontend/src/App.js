@@ -27,6 +27,8 @@ import TeacherQuizzes from "./pages/TeacherQuizzes";
 import TeacherStudents from "./pages/TeacherStudents";
 import TeacherLessonDetail from "./pages/TeacherLessonDetail";
 import TeacherLessonQuiz from "./pages/TeacherLessonQuiz";
+import TeacherCertificates from "./pages/TeacherCertificates";
+import TeacherCourseAnalytics from "./pages/TeacherCourseAnalytics";
 
 
 /* =========================
@@ -166,7 +168,24 @@ export default function App() {
               <TeacherStudents />
             </PrivateRoute>
           }
+
         />
+        <Route
+  path="/teacher/certificates"
+  element={
+    <PrivateRoute role="teacher">
+      <TeacherCertificates />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/teacher/course/:courseId/analytics"
+  element={
+    <PrivateRoute role="teacher">
+      <TeacherCourseAnalytics />
+    </PrivateRoute>
+  }
+/>
 
         {/* 🛠 ADMIN */}
         <Route
