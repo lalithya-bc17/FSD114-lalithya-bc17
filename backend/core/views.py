@@ -9,6 +9,10 @@ from rest_framework.permissions import IsAdminUser
 from django.contrib.auth.models import User
 from rest_framework import status
 from django.db import IntegrityError
+from django.contrib.auth.models import User
+from courses.models import Course, Enrollment, Certificate
+from core.models import Student, Teacher
+from courses.models import Announcement
 
 
 @api_view(['GET'])
@@ -105,9 +109,12 @@ def admin_stats(request):
     return Response({
         "total_users": User.objects.count(),
         "total_students": Student.objects.count(),
+        "total_teachers": Teacher.objects.count(),
         "total_courses": Course.objects.count(),
         "total_enrollments": Enrollment.objects.count(),
         "total_certificates": Certificate.objects.count(),
+        "total_announcements": Announcement.objects.count(),
+
     })
 
 from django.contrib.auth.models import User
@@ -115,19 +122,75 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
+from django.db.models import Q
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def admin_users(request):
+    search = request.GET.get("search", "")
+
     users = User.objects.all()
-    return Response([
-        {
+
+    if search:
+        users = users.filter(
+            Q(username__icontains=search) |
+            Q(email__icontains=search)
+        )
+
+    data = []
+
+    for u in users:
+        if u.is_staff:
+            role = "Admin"
+        elif hasattr(u, "teacher"):
+            role = "Teacher"
+        elif hasattr(u, "student"):
+            role = "Student"
+        else:
+            role = "User"
+
+        data.append({
             "id": u.id,
             "username": u.username,
             "email": u.email,
-            "is_staff": u.is_staff,
+            "role": role,
+        })
+
+    return Response(data)
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def admin_enrollments(request):
+    enrollments = Enrollment.objects.all()
+    return Response([
+        {
+            "id": e.id,
+            "student_name": e.student.user.username,
+            "course_title": e.course.title,
+            "enrolled_at": e.joined_at,
         }
-        for u in users
+        for e in enrollments
     ])
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def admin_certificates(request):
+    certificates = Certificate.objects.all()
+    return Response([
+        {
+            "id": c.id,
+            "student_name": c.student.username,
+            "course_title": c.course.title,
+            "issued_at": c.issued_at,
+            "is_revoked": c.is_revoked,
+
+        }
+        for c in certificates
+    ])
+
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny

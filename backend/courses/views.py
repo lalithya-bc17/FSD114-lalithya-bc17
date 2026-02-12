@@ -27,11 +27,23 @@ from .serializers import CourseSerializer, LessonSerializer
 # COURSES & ENROLLMENT
 # -----------------------------
 
+from django.db.models import Q
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def course_list(request):
+    search = request.GET.get("search", "")
+
     courses = Course.objects.all()
-    return Response(CourseSerializer(courses, many=True).data)
+
+    if search:
+        courses = courses.filter(
+            Q(title__icontains=search) |
+            Q(description__icontains=search)
+        )
+
+    serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
 
 
 @api_view(["GET"])
@@ -623,6 +635,7 @@ from django.shortcuts import get_object_or_404, render
 
 from django.shortcuts import render, get_object_or_404
 from .models import Certificate
+
 def verify_certificate(request, id):
     try:
         certificate = Certificate.objects.get(id=id)
@@ -719,6 +732,24 @@ def unread_notification_count_api(request):
     ).count()
     return Response({"count": count})
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Notification
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def mark_all_notifications_read(request):
+    user = request.user
+
+    Notification.objects.filter(
+        user=user,
+        is_read=False
+    ).update(is_read=True)
+
+    return Response({"message": "All notifications marked as read"})
+
 
 
 from rest_framework.decorators import api_view, permission_classes
@@ -742,19 +773,29 @@ def teacher_create_course(request):
     }, status=201)
 
 
+from django.db.models import Q
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsTeacher])
 def teacher_my_courses(request):
+    search = request.GET.get("search", "")
+
     courses = Course.objects.filter(teacher=request.user.teacher)
 
-    data = []
-    for c in courses:
-        data.append({
+    if search:
+        courses = courses.filter(
+            Q(title__icontains=search) |
+            Q(description__icontains=search)
+        )
+
+    data = [
+        {
             "id": c.id,
             "title": c.title,
             "description": c.description,
-        })
+        }
+        for c in courses
+    ]
 
     return Response(data)
 
@@ -857,6 +898,25 @@ def teacher_lesson_detail(request, lesson_id):
     lesson.save()
 
     return Response({"success": True})
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsTeacher])
+def teacher_course_lessons(request, course_id):
+    lessons = Lesson.objects.filter(
+        course_id=course_id,
+        course__teacher=request.user.teacher
+    ).order_by("order")
+
+    data = [
+        {
+            "id": l.id,
+            "title": l.title,
+            "order": l.order,
+        }
+        for l in lessons
+    ]
+
+    return Response(data)
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -1287,10 +1347,21 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from .models import Course
 
+from django.db.models import Q
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def admin_courses(request):
+    search = request.GET.get("search", "")
+
     courses = Course.objects.all()
+
+    if search:
+        courses = courses.filter(
+            Q(title__icontains=search) |
+            Q(description__icontains=search)
+        )
+
     return Response([
         {
             "id": c.id,
