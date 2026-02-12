@@ -26,6 +26,20 @@ export default function TeacherDashboard() {
 
   return (
     <div className="dashboard-container">
+      <div style={{ marginBottom: "15px" }}>
+  <button
+    onClick={() => navigate("/")}
+    style={{
+      background: "none",
+      border: "none",
+      color: "#0f766e",
+      fontWeight: "600",
+      cursor: "pointer"
+    }}
+  >
+    ← Back to Home
+  </button>
+</div>
       <h2>Welcome, {name} 👋</h2>
       <p className="subtitle">
         Manage your courses, students, and assessments

@@ -103,6 +103,20 @@ export default function Dashboard() {
   ========================== */
   return (
   <div className="dashboard">
+    <div style={{ marginBottom: "15px" }}>
+  <button
+    onClick={() => navigate("/")}
+    style={{
+      background: "none",
+      border: "none",
+      color: "#0f766e",
+      fontWeight: "600",
+      cursor: "pointer"
+    }}
+  >
+    ← Back to Home
+  </button>
+</div>
     <h2>My Learning</h2>
 
     {/* ✅ EMPTY STATE (ADD THIS BLOCK) */}
@@ -137,11 +151,30 @@ export default function Dashboard() {
         <div key={course.course_id} className="course-card">
           <h3>{course.course}</h3>
 
-          <div className="progress">
-            <div className="progress-bar" style={{ width: percent + "%" }}>
-              {percent}%
-            </div>
-          </div>
+          {/* Progress Percentage Text */}
+<div style={{ marginBottom: "6px", fontWeight: "600" }}>
+  {percent}%
+</div>
+
+{/* Progress Bar */}
+<div
+  style={{
+    width: "100%",
+    backgroundColor: "#e5e7eb",
+    borderRadius: "10px",
+    height: "10px",
+    overflow: "hidden"
+  }}
+>
+  <div
+    style={{
+      width: `${percent}%`,
+      backgroundColor: "#16a34a",
+      height: "100%",
+      transition: "width 0.4s ease"
+    }}
+  />
+</div>
 
           <p>
             {course.completed}/{course.total} lessons completed

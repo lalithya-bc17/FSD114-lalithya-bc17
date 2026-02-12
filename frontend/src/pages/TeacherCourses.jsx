@@ -10,6 +10,7 @@ export default function TeacherCourses() {
   // CREATE COURSE STATE
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [search, setSearch] = useState("");
 
   // EDIT COURSE STATE ⭐ NEW
   const [editingCourseId, setEditingCourseId] = useState(null);
@@ -23,7 +24,7 @@ export default function TeacherCourses() {
 
   // ================= LOAD COURSES =================
   const loadCourses = useCallback(() => {
-    fetch(`${API}/teacher/my-courses/`, {
+    fetch(`${API}/teacher/my-courses/?search=${search}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -34,11 +35,11 @@ export default function TeacherCourses() {
       setCourses(list);
     })
       .catch(() => toast.error("Failed to load courses"));
-  }, [token]);
+  }, [token, search]);
 
   useEffect(() => {
     loadCourses();
-  }, [loadCourses]);
+  }, [loadCourses, search]);
 
   // ================= CREATE COURSE =================
   const createCourse = () => {
@@ -97,6 +98,20 @@ export default function TeacherCourses() {
   return (
     <div className="container">
       <h2>My Courses</h2>
+      <input
+  type="text"
+  placeholder="Search my courses..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  style={{
+    padding: "10px",
+    width: "100%",
+    maxWidth: "400px",
+    marginBottom: "20px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+  }}
+/>
 
       {/* ===== EDIT COURSE FORM ⭐ NEW ===== */}
       {editingCourseId && (

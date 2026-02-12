@@ -52,7 +52,7 @@ export default function Navbar() {
           Courses
         </Link>
 
-        <Link to="/verify">Verify</Link>
+        
 
         {/* 🔔 NOTIFICATIONS WITH RED BADGE */}
           <Link to="/notifications" style={{ position: "relative", fontSize: "18px" }}

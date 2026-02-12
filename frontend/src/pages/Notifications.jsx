@@ -37,6 +37,21 @@ export default function Notifications() {
     }
   };
 
+  const handleMarkAllRead = async () => {
+    try {
+      await fetch(`${API}/notifications/mark-all-read/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      loadNotifications();
+    } catch {
+      toast.error("Failed to mark all as read");
+    }
+  };
+
   useEffect(() => {
     loadNotifications();
   }, [loadNotifications]);
@@ -44,6 +59,24 @@ export default function Notifications() {
   return (
     <div style={{ maxWidth: "720px", margin: "20px auto", padding: "10px" }}>
       <h2>🔔 Notifications</h2>
+
+      {/* ✅ Mark All Button */}
+      {notifications.length > 0 && (
+        <button
+          onClick={handleMarkAllRead}
+          style={{
+            padding: "6px 12px",
+            background: "#1B9AAA",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            marginBottom: "15px",
+          }}
+        >
+          Mark All as Read
+        </button>
+      )}
 
       {notifications.length === 0 && (
         <p style={{ color: "#777" }}>No notifications yet</p>

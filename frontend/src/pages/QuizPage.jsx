@@ -5,35 +5,29 @@ import "../styles.css";
 import { toast } from "react-toastify";
 
 export default function QuizPage() {
-  const { id } = useParams(); // quiz id
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [quiz, setQuiz] = useState(null);
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
-
-  // ✅ ref to control reset timer (VERY IMPORTANT)
   const resetTimerRef = useRef(null);
 
-  // 🔄 Reset quiz ONLY for wrong answer
   const resetQuiz = () => {
     setAnswers({});
     setResult(null);
   };
 
-  // ✅ Load quiz
   useEffect(() => {
     getQuiz(id)
       .then((data) => setQuiz(data))
       .catch(() => toast.error("Failed to load quiz"));
   }, [id]);
 
-  // Select answer
   const selectAnswer = (questionId, optionKey) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionKey }));
   };
 
-  // Submit quiz
   const handleSubmit = async () => {
     if (Object.keys(answers).length === 0) {
       toast.error("❌ Please select at least one answer before submitting");
@@ -46,33 +40,32 @@ export default function QuizPage() {
 
       if (res.passed) {
         toast.success("🎉 Quiz passed!");
-
-        // ❌ cancel any pending reset
         if (resetTimerRef.current) {
           clearTimeout(resetTimerRef.current);
           resetTimerRef.current = null;
         }
-
       } else {
         toast.error("❌ Some answers are wrong. Try again.");
-
-        // ✅ auto reset ONLY for failure
         resetTimerRef.current = setTimeout(() => {
           resetQuiz();
         }, 1500);
       }
-
-    } catch (err) {
+    } catch {
       toast.error("Quiz submit failed");
     }
   };
 
   if (!quiz) return <p>Loading quiz...</p>;
 
-  // ✅ If quiz already passed
   if (quiz.passed) {
     return (
-      <div className="container">
+      <div
+        style={{
+          maxWidth: "600px",
+          margin: "50px auto",
+          textAlign: "center"
+        }}
+      >
         <h2>✅ Quiz already passed</h2>
         <button onClick={() => navigate("/student/dashboard")}>
           ⬅ Back to Dashboard
@@ -82,12 +75,21 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="container">
-      <h2>{quiz.title}</h2>
+    <div
+      style={{
+        maxWidth: "650px",
+        margin: "50px auto",
+        padding: "30px",
+        background: "white",
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.08)"
+      }}
+    >
+      <h2 style={{ marginBottom: "30px" }}>{quiz.title}</h2>
 
       {quiz.questions.map((q) => (
-        <div key={q.id} className="card">
-          <h4>{q.text}</h4>
+        <div key={q.id} style={{ marginBottom: "30px" }}>
+          <h4 style={{ marginBottom: "15px" }}>{q.text}</h4>
 
           {["a", "b", "c", "d"].map((key) => {
             let bg = "";
@@ -97,8 +99,8 @@ export default function QuizPage() {
                 (d) => d.question_id === q.id
               );
               if (r) {
-                if (key.toUpperCase() === r.correct) bg = "#c8f7c5";
-                else if (key.toUpperCase() === r.selected) bg = "#f7c5c5";
+                if (key.toUpperCase() === r.correct) bg = "#d1fae5";
+                else if (key.toUpperCase() === r.selected) bg = "#fee2e2";
               }
             }
 
@@ -108,8 +110,11 @@ export default function QuizPage() {
                 style={{
                   display: "block",
                   background: bg,
-                  padding: "5px",
-                  margin: "5px 0",
+                  padding: "10px",
+                  margin: "8px 0",
+                  borderRadius: "6px",
+                  border: "1px solid #e5e7eb",
+                  cursor: "pointer"
                 }}
               >
                 <input
@@ -120,6 +125,7 @@ export default function QuizPage() {
                   onChange={() =>
                     selectAnswer(q.id, key.toUpperCase())
                   }
+                  style={{ marginRight: "8px" }}
                 />
                 {q[key]}
               </label>
@@ -129,33 +135,58 @@ export default function QuizPage() {
       ))}
 
       {!result && (
-        <button onClick={handleSubmit} style={{ marginTop: 20 }}>
+        <button
+          onClick={handleSubmit}
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            background: "#0d9488",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer"
+          }}
+        >
           Submit Quiz
         </button>
       )}
 
       {result && (
-        <div style={{ marginTop: 20 }}>
+        <div style={{ marginTop: "30px" }}>
           <h3>Score: {result.score}%</h3>
           <p>{result.passed ? "✅ Passed" : "❌ Failed"}</p>
 
-          {/* ▶ Resume next lesson */}
           {result.passed && result.next_lesson_id && (
             <button
               onClick={() =>
                 navigate(`/lesson/${result.next_lesson_id}`)
               }
-              className="lesson-open"
+              style={{
+                marginTop: "15px",
+                padding: "10px 18px",
+                background: "#0d9488",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer"
+              }}
             >
               ▶ Resume Next Lesson
             </button>
           )}
 
-          {/* 🎓 Course completed */}
           {result.passed && !result.next_lesson_id && (
             <button
               onClick={() => navigate("/student/dashboard")}
-              className="certificate-btn"
+              style={{
+                marginTop: "15px",
+                padding: "10px 18px",
+                background: "#2563eb",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer"
+              }}
             >
               🎓 Go to Dashboard / Download Certificate
             </button>

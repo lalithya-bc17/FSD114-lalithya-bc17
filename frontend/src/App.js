@@ -5,7 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 // 🌍 Public pages
 import Home from "./pages/Home";
 import Courses from "./pages/Courses";
-
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Notifications from "./pages/Notifications";
@@ -30,6 +29,11 @@ import TeacherLessonQuiz from "./pages/TeacherLessonQuiz";
 import TeacherCertificates from "./pages/TeacherCertificates";
 import TeacherCourseAnalytics from "./pages/TeacherCourseAnalytics";
 
+// 🛠 Admin pages
+import AdminUsers from "./pages/AdminUsers";
+import AdminCourses from "./pages/AdminCourses";
+import AdminEnrollments from "./pages/AdminEnrollments";
+import AdminCertificates from "./pages/AdminCertificates";
 
 /* =========================
    🔐 ROLE-BASED ROUTE
@@ -38,13 +42,8 @@ function PrivateRoute({ children, role }) {
   const token = localStorage.getItem("access");
   const userRole = localStorage.getItem("role");
 
-  if (!token) {
-    return <Navigate to="/login" />;
-  }
-
-  if (role && userRole !== role) {
-    return <Navigate to="/login" />;
-  }
+  if (!token) return <Navigate to="/login" />;
+  if (role && userRole !== role) return <Navigate to="/login" />;
 
   return children;
 }
@@ -53,12 +52,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* 🌍 PUBLIC */}
         <Route path="/" element={<Home />} />
         <Route path="/courses" element={<Courses />} />
-        
-
-        {/* 🔐 AUTH */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/notifications" element={<Notifications />} />
@@ -73,7 +70,6 @@ export default function App() {
           }
         />
 
-        {/* 📚 STUDENT LEARNING FLOW */}
         <Route
           path="/course/:id"
           element={
@@ -129,29 +125,24 @@ export default function App() {
           }
         />
 
-        {/* 👩‍🏫 TEACHER LESSON EDIT */}
         <Route
-         path="/teacher/lesson/:lessonId"
+          path="/teacher/lesson/:lessonId"
           element={
-          <PrivateRoute role="teacher">
-            <TeacherLessonDetail />
-          </PrivateRoute>
+            <PrivateRoute role="teacher">
+              <TeacherLessonDetail />
+            </PrivateRoute>
           }
         />
-
-
 
         <Route
-         path="/teacher/lesson/:lessonId/quiz"
-         element={
-          <PrivateRoute role="teacher">
-           <TeacherLessonQuiz />
-          </PrivateRoute>
+          path="/teacher/lesson/:lessonId/quiz"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherLessonQuiz />
+            </PrivateRoute>
           }
         />
 
-
-        
         <Route
           path="/teacher/quizzes"
           element={
@@ -168,24 +159,25 @@ export default function App() {
               <TeacherStudents />
             </PrivateRoute>
           }
-
         />
+
         <Route
-  path="/teacher/certificates"
-  element={
-    <PrivateRoute role="teacher">
-      <TeacherCertificates />
-    </PrivateRoute>
-  }
-/>
-<Route
-  path="/teacher/course/:courseId/analytics"
-  element={
-    <PrivateRoute role="teacher">
-      <TeacherCourseAnalytics />
-    </PrivateRoute>
-  }
-/>
+          path="/teacher/certificates"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherCertificates />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/teacher/course/:courseId/analytics"
+          element={
+            <PrivateRoute role="teacher">
+              <TeacherCourseAnalytics />
+            </PrivateRoute>
+          }
+        />
 
         {/* 🛠 ADMIN */}
         <Route
@@ -196,17 +188,44 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
+        <Route
+          path="/admin/users"
+          element={
+            <PrivateRoute role="admin">
+              <AdminUsers />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/admin/courses"
+          element={
+            <PrivateRoute role="admin">
+              <AdminCourses />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/enrollments"
+          element={
+            <PrivateRoute role="admin">
+              <AdminEnrollments />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/certificates"
+          element={
+            <PrivateRoute role="admin">
+              <AdminCertificates />
+            </PrivateRoute>
+          }
+        />
+
       </Routes>
 
-      {/* 🔔 TOASTS */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        theme="light"
-      />
+      <ToastContainer position="top-right" autoClose={3000} />
     </BrowserRouter>
   );
 }

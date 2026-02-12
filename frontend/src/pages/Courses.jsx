@@ -8,10 +8,11 @@ const API = "https://certificate-verification-backend-7gpb.onrender.com/api";
 export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${API}/courses/`, {
+    fetch(`${API}/courses/?search=${search}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("access"),
       },
@@ -27,7 +28,7 @@ export default function Courses() {
         }
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [search]);
 
   const handleEnroll = async (courseId) => {
     try {
@@ -42,29 +43,45 @@ export default function Courses() {
   if (loading) return <p>Loading courses...</p>;
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Available Courses</h2>
+  <div style={{ padding: 20 }}>
+    <h2>Available Courses</h2>
 
-      {courses.length === 0 && <p>No courses available</p>}
+    {/* 🔍 SEARCH INPUT — ADD HERE */}
+    <input
+      type="text"
+      placeholder="Search courses..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      style={{
+        padding: "10px",
+        width: "100%",
+        maxWidth: "400px",
+        marginBottom: "20px",
+        borderRadius: "8px",
+        border: "1px solid #ccc",
+      }}
+    />
 
-      {courses.map((course) => (
-        <div
-          key={course.id}
-          style={{
-            border: "1px solid #ccc",
-            margin: 10,
-            padding: 15,
-            borderRadius: 8,
-          }}
-        >
-          <h3>{course.title}</h3>
-          <p>{course.description}</p>
+    {courses.length === 0 && <p>No courses available</p>}
 
-          <button onClick={() => handleEnroll(course.id)}>
-            Enroll
-          </button>
-        </div>
-      ))}
-    </div>
-  );
+    {courses.map((course) => (
+      <div
+        key={course.id}
+        style={{
+          border: "1px solid #ccc",
+          margin: 10,
+          padding: 15,
+          borderRadius: 8,
+        }}
+      >
+        <h3>{course.title}</h3>
+        <p>{course.description}</p>
+
+        <button onClick={() => handleEnroll(course.id)}>
+          Enroll
+        </button>
+      </div>
+    ))}
+  </div>
+);
 }

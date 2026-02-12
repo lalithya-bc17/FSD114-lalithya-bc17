@@ -16,7 +16,7 @@ export default function TeacherCourseDetail() {
   // 🔄 Load lessons
   const loadLessons = useCallback(async () => {
     const res = await fetch(
-      `${API}/courses/${courseId}/lessons/`,
+      `${API}/teacher/course/${courseId}/lessons/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -25,7 +25,7 @@ export default function TeacherCourseDetail() {
     );
 
     const data = await res.json();
-    setLessons(data.courses || []);
+    setLessons(Array.isArray(data) ? data : []);
   }, [courseId, token]);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function TeacherCourseDetail() {
           </button>
           
 
-          <p>Status: {l.status}</p>
+          
         </div>
       ))}
     </div>

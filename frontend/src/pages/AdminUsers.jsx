@@ -3,9 +3,10 @@ import { toast } from "react-toastify";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/admin/users/", {
+    fetch(`https://certificate-verification-backend-7gpb.onrender.com/api/admin/users/?search=${search}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("access"),
       },
@@ -13,16 +14,30 @@ export default function AdminUsers() {
       .then(res => res.json())
       .then(data => setUsers(data))
       .catch(() => toast.error("Failed to load users"));
-  }, []);
+  }, [search]);
 
   return (
     <div className="container">
       <h2>All Users</h2>
+      <input
+  type="text"
+  placeholder="Search users..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  style={{
+    padding: "10px",
+    width: "100%",
+    maxWidth: "400px",
+    marginBottom: "20px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+  }}
+/>
       {users.map(u => (
         <div key={u.id} className="card">
           <p><b>{u.username}</b></p>
           <p>{u.email}</p>
-          <p>Role: {u.is_staff ? "Admin" : "Student"}</p>
+          <p><strong>Role:</strong> {u.role}</p>
         </div>
       ))}
     </div>
