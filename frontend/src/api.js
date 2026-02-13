@@ -42,6 +42,7 @@ export async function login(username, password) {
 ====================== */
 export const getDashboard = async () => {
   const role = localStorage.getItem("role");
+  console.log("ROLE FROM STORAGE:", role);
 if (!role) {
   throw new Error("Role not found. Please login again.");
 }
