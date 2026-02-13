@@ -41,7 +41,14 @@ export async function login(username, password) {
    DASHBOARD
 ====================== */
 export const getDashboard = async () => {
-  const res = await fetch(`${API}/student/dashboard/`, {
+  const role = localStorage.getItem("role");
+
+  const endpoint =
+    role === "teacher"
+      ? `${API}/teacher/dashboard/`
+      : `${API}/student/dashboard/`;
+
+  const res = await fetch(endpoint, {
     headers: authHeader(),
   });
 
