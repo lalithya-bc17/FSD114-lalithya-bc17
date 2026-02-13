@@ -42,11 +42,15 @@ export async function login(username, password) {
 ====================== */
 export const getDashboard = async () => {
   const role = localStorage.getItem("role");
+if (!role) {
+  throw new Error("Role not found. Please login again.");
+}
 
-  const endpoint =
-    role === "teacher"
-      ? `${API}/teacher/dashboard/`
-      : `${API}/student/dashboard/`;
+const endpoint =
+  role === "teacher"
+    ? `${API}/teacher/dashboard/`
+    : `${API}/student/dashboard/`;
+  
 
   const res = await fetch(endpoint, {
     headers: authHeader(),
